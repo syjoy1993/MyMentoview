@@ -22,7 +22,7 @@ public class UserResp {
     String name;
     Role role;
     SocialProvider socialProvider;
-    String socialId;
+    String providerId;
     boolean isSocial;
     UserStatus status;
 }

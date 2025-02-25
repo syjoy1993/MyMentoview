@@ -21,15 +21,15 @@ public class UserDto {
     String name;
     Role role;
     SocialProvider socialProvider;
-    String socialId;
+    String providerId;
     boolean isSocial;
     UserStatus status;
 
-    public static UserDto of(String email, String password, String name, Role role, SocialProvider socialProvider, String socialId, boolean isSocial, UserStatus status) {
-        return new UserDto(null,email, password, name, role, socialProvider, socialId, isSocial, status);
+    public static UserDto of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status) {
+        return new UserDto(null,email, password, name, role, socialProvider, providerId, isSocial, status);
     }
-    public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String socialId, boolean isSocial, UserStatus status) {
-        return new UserDto(userId, email, password, name, role, socialProvider, socialId, isSocial, status);
+    public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status) {
+        return new UserDto(userId, email, password, name, role, socialProvider, providerId, isSocial, status);
     }
     public UserDto toDto(User user) {
         return UserDto.builder()
@@ -38,7 +38,7 @@ public class UserDto {
                 .name(user.getName())
                 .role(user.getRole())
                 .socialProvider(user.getSocialProvider())
-                .socialId(user.getSocialId())
+                .providerId(user.getProviderId())
                 .isSocial(user.isSocial())
                 .status(user.getStatus())
                 .build();

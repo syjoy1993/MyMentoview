@@ -1,5 +1,7 @@
 package ce2team1.mentoview.config;
 
+import ce2team1.mentoview.security.MvOAuth2AuthenticationFailureHandler;
+import ce2team1.mentoview.security.MvOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,20 +15,32 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
+    private final MvOAuth2UserService mvOAuth2UserService;
+    private final MvOAuth2AuthenticationFailureHandler mvOAuth2AuthenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
         security.cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                //.oauth2Login((Customizer.withDefaults()))//oauth2
+                .formLogin(formLogin -> formLogin.loginPage("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password"))
+
                 .headers(headers -> headers
-                        .httpStrictTransportSecurity(hsts -> hsts.disable()));
+                        .httpStrictTransportSecurity(hsts -> hsts.disable()));//AWS
+        //OAuth2
+        security.oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                        .userService(mvOAuth2UserService))
+                .failureHandler(mvOAuth2AuthenticationFailureHandler));
         // 인가
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/", "/favicon.ico", "/static","/about","/contactus").permitAll()
-                        .requestMatchers("/login","/signup").permitAll()
-                        .requestMatchers("/api/signup/**", "/api/login").permitAll()
+                        .requestMatchers("/api/signup/**", "/api/login/**").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

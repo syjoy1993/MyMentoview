@@ -40,7 +40,7 @@ public class User extends AuditingFields {
     private SocialProvider socialProvider;// OAuth
 
     @Column(nullable = true)
-    private String socialId;// OAuth
+    private String providerId;// OAuth의 providerId
 
     private boolean isSocial;
 
@@ -49,12 +49,19 @@ public class User extends AuditingFields {
 
     private String refreshToken;
 
-    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String socialId, boolean isSocial, UserStatus status, String refreshToken ) {
-        SocialProvider finalSocialProvider = socialProvider != null ? socialProvider : SocialProvider.NONE;
-        String finalSocialId = (finalSocialProvider == SocialProvider.NONE) ? null : socialId;
+    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status, String refreshToken ) {
+
         return new User(
-                null, email, password, name, role != null ? role : Role.USER, finalSocialProvider, finalSocialId, false, status != null ? status : UserStatus.ACTIVE, null
-        );
+                null,
+                email,
+                password,  // ✅ 소셜 로그인 사용자는 비밀번호 입력 필수
+                name,
+                role != null ? role : Role.USER,  // 기본값: USER
+                socialProvider,
+                providerId,
+                isSocial,
+                status != null ? status : UserStatus.ACTIVE,  // 기본값: ACTIVE
+                null);
 
     }
     public static User toEntity(UserDto userDto) {
@@ -65,13 +72,12 @@ public class User extends AuditingFields {
                 .name(userDto.getName())
                 .role(userDto.getRole())
                 .socialProvider(userDto.getSocialProvider())
-                .socialId(userDto.getSocialId())
+                .providerId(userDto.getProviderId())
                 .isSocial(userDto.isSocial())
                 .status(userDto.getStatus())
                 .build();
 
     }
-
 
     @Override
     public final boolean equals(Object o) {

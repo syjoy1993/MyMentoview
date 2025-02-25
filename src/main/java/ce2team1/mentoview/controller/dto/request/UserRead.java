@@ -13,5 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRead {
-    private String token;
+    private String email;
+    private String profile;
+    private String openid;
+
 }

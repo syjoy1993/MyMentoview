@@ -29,7 +29,7 @@ public class UserCreateSocial {
     @NotNull
     private SocialProvider socialProvider;
     @NotBlank
-    private String socialId;
+    private String providerId;
     @Builder.Default
     private boolean isSocial = true;
     @Builder.Default
