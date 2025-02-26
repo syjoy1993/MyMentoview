@@ -28,7 +28,7 @@ public class InterviewResponse extends AuditingFields {
     private Boolean answered; // 상태 필드 3가 필요시 Enum
     private Duration duration;//?
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY)//,cascade = CascadeType.REMOVE)
     @JoinColumn(name = "question_id", nullable = false, unique = true)
     private InterviewQuestion question;
 

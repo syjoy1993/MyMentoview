@@ -16,13 +16,12 @@ public class GoogleOAuth2Response implements OAuth2ResponseSocial {
 
     @Override
     public SocialProvider getProvider() {
-
-        return SocialProvider.byValue(googleUserAttribute.get("provider").toString());
+        return SocialProvider.GOOGLE;
     }
 
     @Override
     public String getProviderId() {
-        return googleUserAttribute.get("providerId").toString();
+        return googleUserAttribute.get("sub").toString();
     }
 
     @Override

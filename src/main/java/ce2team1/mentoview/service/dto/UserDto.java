@@ -31,7 +31,7 @@ public class UserDto {
     public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status) {
         return new UserDto(userId, email, password, name, role, socialProvider, providerId, isSocial, status);
     }
-    public UserDto toDto(User user) {
+    public static UserDto toDto(User user) {
         return UserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())

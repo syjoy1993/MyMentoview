@@ -5,7 +5,7 @@ import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.security.dto.GoogleOAuth2Response;
-import ce2team1.mentoview.security.dto.MvOAuth2User;
+import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.dto.OAuth2ResponseSocial;
 import ce2team1.mentoview.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,10 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MvOAuth2UserService extends DefaultOAuth2UserService {
-
     private final UserRepository userRepository;
 
     @Override
@@ -35,7 +32,6 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
 
         //공급사 확인 , 추후 공급사 추가 예정 고려
         OAuth2ResponseSocial responseSocial = null;
-
         if (registrationId.equals("google")) {
             responseSocial = new GoogleOAuth2Response((oAuth2User.getAttributes()));
         } else {
@@ -54,14 +50,11 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
                 UserStatus.ACTIVE
         );
 
-        Optional<User> findByEmailSocialUser =
-                userRepository.findByEmailAndProviderId((responseSocial.getEmail()), responseSocial.getProviderId());
-        if (findByEmailSocialUser.isPresent()) {
-            return new MvOAuth2User(userDto);
-        } else {
-            throw new OAuth2AuthenticationException("SOCIAL_LOGIN_NEW_USER");
-        }
+       User repositoryUser = userRepository.findByEmail(responseSocial.getEmail())
+                .orElseGet(() -> userRepository.save(User.toEntity(userDto)));
 
+
+        return new MvPrincipalDetails(UserDto.toDto(repositoryUser), LoginType.OAUTH2);
     }
 
 }

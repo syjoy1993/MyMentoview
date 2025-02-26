@@ -8,8 +8,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
+
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
@@ -20,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
-        security.cors(cors -> cors.disable())
+        security.cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 //.oauth2Login((Customizer.withDefaults()))//oauth2
@@ -40,7 +43,7 @@ public class SecurityConfig {
                 authorizeRequests
                         .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/", "/favicon.ico", "/static","/about","/contactus").permitAll()
-                        .requestMatchers("/api/signup/**", "/api/login/**").permitAll()
+                        .requestMatchers("/api/signup/**", "/api/login/**","/api/auth/google").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -52,4 +55,10 @@ public class SecurityConfig {
         return security.build();
 
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }
