@@ -24,11 +24,11 @@ public class InterviewResponse extends AuditingFields {
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String response; // 위스퍼가 변환
+    private String response; // AWS Transcribe 가 변환
     private Boolean answered; // 상태 필드 3가 필요시 Enum
     private Duration duration;//?
 
-    @OneToOne(fetch = FetchType.LAZY)//,cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false, unique = true)
     private InterviewQuestion question;
 

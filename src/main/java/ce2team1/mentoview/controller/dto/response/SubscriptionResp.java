@@ -37,7 +37,7 @@ public class SubscriptionResp {
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
                 .nextBillingDate(dto.getNextBillingDate())
-                .payment_method(dto.getPaymentMethod().toString())
+                .paymentMethod(dto.getPaymentMethod().toString())
                 .userId(dto.getUserId())
                 .build();
 
