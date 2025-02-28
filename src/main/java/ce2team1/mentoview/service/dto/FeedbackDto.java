@@ -17,14 +17,14 @@ public class FeedbackDto {
     private Integer score;
     private Long questionId;
 
-    private static FeedbackDto of(String feedback, Integer score, Long questionId) {
+    public static FeedbackDto of(String feedback, Integer score, Long questionId) {
         return new FeedbackDto(null, feedback, score, questionId);
     }
     private static FeedbackDto of(Long feedbackId, String feedback, Integer score, Long questionId) {
         return new FeedbackDto(feedbackId, feedback, score, questionId);
     }
 
-    private static FeedbackDto toDto(InterviewFeedback feedback) {
+    public static FeedbackDto toDto(InterviewFeedback feedback) {
         return FeedbackDto.builder()
                 .feedbackId(feedback.getFeedbackId())
                 .feedback(feedback.getFeedback())
