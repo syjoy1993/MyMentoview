@@ -18,9 +18,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InterviewCreate {
     @NotNull
-    private InterviewStatus interviewStatus;
+    private InterviewStatus interviewStatus = InterviewStatus.QUESTION_CREATED;
     @NotNull
-    private InterviewType interviewType;
+    private InterviewType interviewType = InterviewType.VOICE;
     @NotNull
     private Long resumeId;
 

@@ -19,13 +19,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubscriptionResp {
+
     Long subId;
     SubscriptionStatus status;
     SubscriptionPlan plan;
     LocalDate startDate;
     LocalDate endDate;
     LocalDate nextBillingDate;
-    String payment_method;
+    String paymentMethod;
     Long userId;
 
     public static SubscriptionResp toResp(SubscriptionDto dto) {

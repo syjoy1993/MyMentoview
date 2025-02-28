@@ -25,16 +25,22 @@ public class InterviewQuestion extends AuditingFields {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interview_id", nullable = false)
     private Interview interview;
 
+    @OneToOne(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private InterviewResponse interviewResponse;
+
+    @OneToOne(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private InterviewFeedback interviewFeedback;
+
     public static InterviewQuestion of(String question, Difficulty difficulty, Interview interview) {
-        return new InterviewQuestion (null, question, difficulty, interview);
+        return new InterviewQuestion (null, question, difficulty, interview, null, null);
 
     }
-    public static InterviewQuestion of(Long responseId, String question, Difficulty difficulty, Interview interview) {
-        return new InterviewQuestion (responseId, question, difficulty, interview);
+    public static InterviewQuestion of(Long questionId, String question, Difficulty difficulty, Interview interview) {
+        return new InterviewQuestion (questionId, question, difficulty, interview, null, null);
 
     }
 
