@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 public class AuditingFields {
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, length = 20)
     @CreatedDate
     protected LocalDateTime createdAt ;
 
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false, length = 20)
+    @Column(name = "created_by",updatable = false, length = 20)
     protected String createdBy;
 
     @LastModifiedDate
@@ -30,6 +30,6 @@ public class AuditingFields {
     protected LocalDateTime modifiedAt;
 
     @LastModifiedBy
-    @Column(name = "modified_by",nullable = false, updatable = true, length = 20)
+    @Column(name = "modified_by", updatable = true, length = 20)
     protected String modifiedBy;
 }

@@ -40,21 +40,26 @@ public class User extends AuditingFields {
     private SocialProvider socialProvider;// OAuth
 
     @Column(nullable = true)
-    private String socialId;// OAuth
+    private String providerId;// OAuth의 providerId
 
-    private boolean isSocial;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    private String refreshToken;
+    private String billingKey;
 
-    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String socialId, boolean isSocial, UserStatus status, String refreshToken ) {
-        SocialProvider finalSocialProvider = socialProvider != null ? socialProvider : SocialProvider.NONE;
-        String finalSocialId = (finalSocialProvider == SocialProvider.NONE) ? null : socialId;
+    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status, String billingKey ) {
+
         return new User(
-                null, email, password, name, role != null ? role : Role.USER, finalSocialProvider, finalSocialId, false, status != null ? status : UserStatus.ACTIVE, null
-        );
+                null,
+                email,
+                password,  // ✅ 소셜 로그인 사용자는 비밀번호 입력 필수
+                name,
+                role != null ? role : Role.USER,  // 기본값: USER
+                socialProvider,
+                providerId,
+                status != null ? status : UserStatus.ACTIVE,  // 기본값: ACTIVE
+                null);
 
     }
     public static User toEntity(UserDto userDto) {
@@ -65,12 +70,16 @@ public class User extends AuditingFields {
                 .name(userDto.getName())
                 .role(userDto.getRole())
                 .socialProvider(userDto.getSocialProvider())
-                .socialId(userDto.getSocialId())
-                .isSocial(userDto.isSocial())
+                .providerId(userDto.getProviderId())
                 .status(userDto.getStatus())
                 .build();
 
     }
+    // OAuth2용
+    public void updateSocialInfo(String newProviderId) {
+        this.providerId = newProviderId;
+    }
+
 
 
     @Override

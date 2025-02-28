@@ -7,7 +7,7 @@ import jakarta.persistence.Converter;
 
 import java.util.Arrays;
 
-@Converter
+@Converter(autoApply = true)
 public class UserRoleConverter implements AttributeConverter<Role,String> {
 
     @Override

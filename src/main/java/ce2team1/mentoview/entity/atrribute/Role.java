@@ -2,11 +2,11 @@ package ce2team1.mentoview.entity.atrribute;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
+
+import java.util.Arrays;
 
 //컨버터 필요
 @Getter
-@ToString
 @AllArgsConstructor
 public enum Role {
     USER("ROLE_USER"),
@@ -14,6 +14,11 @@ public enum Role {
 
     private final String code;
 
-
+    public static Role toCode(String code) {
+        return Arrays.stream(Role.values())
+                .filter(role -> role.getCode().equals(code))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("알 수 없는 역할: " + code));
+    }
 
 }
