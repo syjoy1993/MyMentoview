@@ -25,7 +25,7 @@ public class InterviewQuestion extends AuditingFields {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)//,cascade = CascadeType.REMOVE)
     @JoinColumn(name = "interview_id", nullable = false)
     private Interview interview;
 
