@@ -2,6 +2,8 @@ package ce2team1.mentoview.controller.dto.response;
 
 import ce2team1.mentoview.entity.atrribute.SubscriptionPlan;
 import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
+import ce2team1.mentoview.service.dto.PaymentDto;
+import ce2team1.mentoview.service.dto.SubscriptionDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +27,18 @@ public class SubscriptionResp {
     LocalDate nextBillingDate;
     String payment_method;
     Long userId;
+
+    public static SubscriptionResp toResp(SubscriptionDto dto) {
+        return SubscriptionResp.builder()
+                .subId(dto.getSubId())
+                .status(dto.getStatus())
+                .plan(dto.getPlan())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .nextBillingDate(dto.getNextBillingDate())
+                .payment_method(dto.getPaymentMethod().toString())
+                .userId(dto.getUserId())
+                .build();
+
+    }
 }

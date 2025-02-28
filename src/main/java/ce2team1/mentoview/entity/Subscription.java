@@ -69,6 +69,7 @@ public class Subscription extends AuditingFields {
     }
 
 
-
-
+    public void modifyStatusToCanceled() {
+        this.status = SubscriptionStatus.CANCELED;
+    }
 }

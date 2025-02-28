@@ -2,6 +2,7 @@ package ce2team1.mentoview.controller.dto.response;
 
 
 import ce2team1.mentoview.entity.atrribute.PaymentStatus;
+import ce2team1.mentoview.service.dto.PaymentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,4 +27,15 @@ public class PaymentResp {
     private PaymentStatus status;
     private LocalDateTime paymentDate;
     private Long subId;
+
+    public static PaymentResp toResp(PaymentDto dto) {
+        return PaymentResp.builder()
+                .paymentId(dto.getPaymentId())
+                .amount(dto.getAmount())
+                .approvalCode(dto.getApprovalCode())
+                .status(dto.getStatus())
+                .paymentDate(dto.getPaymentDate())
+                .subId(dto.getSubId())
+                .build();
+    }
 }
