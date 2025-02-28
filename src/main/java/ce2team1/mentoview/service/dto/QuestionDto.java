@@ -18,14 +18,14 @@ public class QuestionDto {
     private Difficulty difficulty;
     private Long interviewId;
 
-    private static QuestionDto of(String question, Difficulty difficulty, Long interviewId) {
+    public static QuestionDto of(String question, Difficulty difficulty, Long interviewId) {
         return new QuestionDto(null, question, difficulty, interviewId);
     }
-    private static QuestionDto of(Long questionId, String question, Difficulty difficulty, Long interviewId) {
+    public static QuestionDto of(Long questionId, String question, Difficulty difficulty, Long interviewId) {
         return new QuestionDto(questionId, question, difficulty, interviewId);
     }
 
-    private static QuestionDto toDto(InterviewQuestion question) {
+    public static QuestionDto toDto(InterviewQuestion question) {
         return QuestionDto.builder()
                 .questionId(question.getQuestionId())
                 .question(question.getQuestion())

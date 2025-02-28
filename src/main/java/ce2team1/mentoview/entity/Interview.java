@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Builder
@@ -32,12 +34,16 @@ public class Interview extends AuditingFields {
     @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;
 
+    @OneToMany(mappedBy = "interview", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<InterviewQuestion> questionList = new ArrayList<>();
+
+
     public static Interview of(InterviewStatus interviewStatus, InterviewType interviewType, Resume resume) {
-        return new Interview (null, interviewStatus, interviewType, resume);
+        return new Interview (null, interviewStatus, interviewType, resume, new ArrayList<>());
 
     }
     public static Interview of(Long interviewId, InterviewStatus interviewStatus, InterviewType interviewType, Resume resume) {
-        return new Interview (interviewId, interviewStatus, interviewType, resume);
+        return new Interview (interviewId, interviewStatus, interviewType, resume, new ArrayList<>());
 
     }
 
