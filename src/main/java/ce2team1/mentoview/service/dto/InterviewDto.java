@@ -23,14 +23,14 @@ public class InterviewDto {
     private Long resumeId;
 
 
-    private static InterviewDto of(InterviewStatus interviewStatus, InterviewType interviewType, LocalDateTime createdAt, Long resumeId) {
+    public static InterviewDto of(InterviewStatus interviewStatus, InterviewType interviewType, LocalDateTime createdAt, Long resumeId) {
         return new InterviewDto(null, interviewStatus, interviewType, null, resumeId);
     }
-    private static InterviewDto of(Long interviewId, InterviewStatus interviewStatus, InterviewType interviewType, LocalDateTime createdAt, Long resumeId) {
+    public static InterviewDto of(Long interviewId, InterviewStatus interviewStatus, InterviewType interviewType, LocalDateTime createdAt, Long resumeId) {
         return new InterviewDto(interviewId, interviewStatus, interviewType, null, resumeId);
     }
 
-    private static InterviewDto toDto(Interview interview) {
+    public static InterviewDto toDto(Interview interview) {
         return InterviewDto.builder()
                 .interviewId(interview.getInterviewId())
                 .interviewStatus(interview.getInterviewStatus())
