@@ -25,4 +25,10 @@ public class RefreshTokenService {
         return tokenDto;
 
     }
+
+    public String getRefreshToken(String email) {
+        return refreshTokenRepository.findByUserEmail(email).map(
+                refreshToken -> refreshToken.getRefreshToken()).orElse(null);
+    }
+
 }

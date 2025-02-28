@@ -21,6 +21,8 @@ public class JwtTokenProvider {
     private SecretKey secretKey;
     private long accessTokenExpiration;
     private long refreshTokenExpiration;
+    private static final String ACCESS = "access";
+    private static final String REFRESH = "refresh";
 
     //JwtTokenProvider 생성자
     public JwtTokenProvider(
@@ -36,33 +38,66 @@ public class JwtTokenProvider {
 
     //AccessToken
     public String createAccessToken(String email, Role role) {
-        return createToken(email, role, accessTokenExpiration);
+        return createToken(ACCESS, email, role, accessTokenExpiration);
     }
     //RefreshToken
     public String createRefreshToken(String email, Role role) {
-        return createToken(email, role, refreshTokenExpiration);
+        return createToken(REFRESH ,email, role, refreshTokenExpiration);
     }
 
     // 토큰 검증 메서드 : 토큰을 인자로 받음 ,java꺼
-    public String getEmailFromToken(String token) {
+    public boolean validateToken(String token) { // 서명 검증
+        try {
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getEmailFromToken(String token) { // 이멜검증
+        if (validateToken(token)) {
+            throw new SecurityException("Invalid JWT Token");
+        }
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
                 .get("email").toString();
     }
-    public String getRoleFromToken(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+
+    public Role getRoleFromToken(String token) { //role검증
+        if (validateToken(token)) {
+            throw new SecurityException("Invalid JWT Token");
+        }
+        String role = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
                 .get("role").toString();
+
+        return Role.valueOf(role);
     }
 
-    public Boolean isExpired(String token) {
+
+    public Boolean isExpired(String token) { // 만료
+        try {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
                 .getExpiration().before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
     }
 
+    public String getType(String token) { //타입검
+        if (validateToken(token)) {
+            throw new SecurityException("Invalid JWT Token");
+        }
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("type").toString();
+    }
+
+
     // 토큰 생성!
-    private  String createToken(String email, Role role,  Long expiration) {
+    private  String createToken(String type ,String email, Role role, Long expiration) {
         return Jwts.builder()
+                .claim("type", type)
                 .claim("email", email)
-                .claim("role", role.getCode())                        // 이거 체크해라 .toString()저
+                .claim("role", role.getCode())
                 .issuedAt(new Date(System.currentTimeMillis())) //시간
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(secretKey)

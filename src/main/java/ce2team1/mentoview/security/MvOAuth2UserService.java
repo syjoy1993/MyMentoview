@@ -22,17 +22,20 @@ import org.springframework.stereotype.Service;
 public class MvOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         log.info("user: {}", oAuth2User);
 
+
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         //공급사 확인 , 추후 공급사 추가 예정 고려
         OAuth2ResponseSocial responseSocial = null;
-        if (registrationId.equals("google")) {
+
+        if ("google".equals(registrationId)) {
             responseSocial = new GoogleOAuth2Response((oAuth2User.getAttributes()));
         } else {
             throw new OAuth2AuthenticationException("지원하지 않는 OAuth2 제공자입니다: " + registrationId);
@@ -46,17 +49,33 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
                 Role.USER,
                 responseSocial.getProvider(), // 소셜 제공자
                 responseSocial.getProviderId(), // 소셜 고유 ID
-                true, // 소셜 로그인 여부
-                UserStatus.ACTIVE
+                UserStatus.ACTIVE,
+                null
         );
+        final OAuth2ResponseSocial finalResponseSocial = responseSocial;
 
-       User repositoryUser = userRepository.findByEmail(responseSocial.getEmail())
+        User repositoryUser = userRepository.findByEmail(responseSocial.getEmail())
                 .orElseGet(() -> userRepository.save(User.toEntity(userDto)));
 
+        return new MvPrincipalDetails(UserDto.toDto(repositoryUser));    }
 
-        return new MvPrincipalDetails(UserDto.toDto(repositoryUser), LoginType.OAUTH2);
+//  private User updateUser(User user, OAuth2ResponseSocial responseSocial) {
+//        user.updateSocialInfo(responseSocial.getProviderId());
+//
+//        return userRepository.save(user);
+//
+//    }
+    private User createUser(OAuth2ResponseSocial responseSocial) {
+        return User.builder()
+                .email(responseSocial.getEmail())
+                .name(responseSocial.getName())
+                .role(Role.USER)
+                .socialProvider(responseSocial.getProvider())
+                .providerId(responseSocial.getProviderId())
+                .status(UserStatus.ACTIVE)
+                .build();
+
     }
-
 }
 
 

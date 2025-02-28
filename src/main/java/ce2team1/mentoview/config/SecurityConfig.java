@@ -1,7 +1,6 @@
 package ce2team1.mentoview.config;
 
-import ce2team1.mentoview.security.MvOAuth2AuthenticationFailureHandler;
-import ce2team1.mentoview.security.MvOAuth2UserService;
+import ce2team1.mentoview.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @RequiredArgsConstructor
@@ -20,13 +20,16 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final MvOAuth2UserService mvOAuth2UserService;
     private final MvOAuth2AuthenticationFailureHandler mvOAuth2AuthenticationFailureHandler;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final MvSuccessHandler mvSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
         security.cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                //.oauth2Login((Customizer.withDefaults()))//oauth2
+                //.oauth2Login((Customizer.withDefaults()))//oauth2 해제X
                 .formLogin(formLogin -> formLogin.loginPage("/login")
                         .usernameParameter("email")
                         .passwordParameter("password"))
@@ -37,13 +40,16 @@ public class SecurityConfig {
         security.oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                         .userService(mvOAuth2UserService))
+                .successHandler(mvSuccessHandler)
                 .failureHandler(mvOAuth2AuthenticationFailureHandler));
+
+        security.addFilterAfter(new MvRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         // 인가
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/", "/favicon.ico", "/static","/about","/contactus").permitAll()
-                        .requestMatchers("/api/signup/**", "/api/login/**","/api/auth/google").permitAll()
+                        .requestMatchers("/api/signup/**", "/api/login/**","/api/auth/google","/token/**").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

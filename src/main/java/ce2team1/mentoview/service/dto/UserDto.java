@@ -11,26 +11,34 @@ import lombok.*;
  * DTO for {@link User}
  */
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserDto {
-    Long userId;
-    String email;
-    String password;
-    String name;
-    Role role;
-    SocialProvider socialProvider;
-    String providerId;
-    boolean isSocial;
-    UserStatus status;
+    private Long userId;
+    private String email;
+    private String password;
+    private String name;
+    private Role role;
+    private SocialProvider socialProvider;
+    private String providerId;
+    private UserStatus status;
+    private String billingKey;
 
-    public static UserDto of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status) {
-        return new UserDto(null,email, password, name, role, socialProvider, providerId, isSocial, status);
+    public static UserDto of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, UserStatus status, String billingKey) {
+        return new UserDto(null, email, password, name, role, socialProvider, providerId,  status, null);
     }
-    public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status) {
-        return new UserDto(userId, email, password, name, role, socialProvider, providerId, isSocial, status);
+    public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, UserStatus status, String billingKey) {
+        return new UserDto(userId, email, password, name, role, socialProvider, providerId, status, null);
     }
+    public static UserDto of(String email, Role role) {
+        return UserDto.builder()
+                .email(email)
+                .role(role)
+                .build();
+    }
+
+
     public static UserDto toDto(User user) {
         return UserDto.builder()
                 .userId(user.getUserId())
@@ -39,10 +47,11 @@ public class UserDto {
                 .role(user.getRole())
                 .socialProvider(user.getSocialProvider())
                 .providerId(user.getProviderId())
-                .isSocial(user.isSocial())
                 .status(user.getStatus())
                 .build();
     }
+
+
 
 
 }

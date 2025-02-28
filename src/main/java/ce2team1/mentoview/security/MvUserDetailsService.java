@@ -18,7 +18,7 @@ public class MvUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .map(user -> new MvPrincipalDetails(UserDto.toDto(user), LoginType.FORM))
+                .map(user -> new MvPrincipalDetails(UserDto.toDto(user)))
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
     }
 }

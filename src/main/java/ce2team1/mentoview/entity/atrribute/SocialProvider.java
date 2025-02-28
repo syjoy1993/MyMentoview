@@ -1,11 +1,13 @@
 package ce2team1.mentoview.entity.atrribute;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 
 @Getter
 @RequiredArgsConstructor
+@JsonFormat(shape = JsonFormat.Shape.STRING)
 public enum SocialProvider {
     NONE("none"),
     GOOGLE("google");

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
+
+
 }

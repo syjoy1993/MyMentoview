@@ -1,7 +1,6 @@
 package ce2team1.mentoview.security.dto;
 
 import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.security.LoginType;
 import ce2team1.mentoview.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +16,7 @@ import java.util.Map;
 public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     private final UserDto userDto;
-    private final LoginType loginType;
+    //private final Map<String, Object> attributes;
 
     //검증 이메일로함
     @Override
@@ -34,12 +33,16 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
         return userDto.getName();
     }
 
-    public Long getUserId() {
+    public Long getUserId() { // Long id
         return userDto.getUserId();
     }
 
-    public LoginType getLoginType() {
-        return loginType;
+    public static UserDto toDto(MvPrincipalDetails mvPrincipalDetails) {
+        return UserDto.builder()
+                .userId(mvPrincipalDetails.getUserId())
+                .email(mvPrincipalDetails.getName())
+                .name(mvPrincipalDetails.getUsername())
+                .build();
     }
 
     @Override
@@ -61,6 +64,6 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     @Override
     public Map<String, Object> getAttributes() { // 받은 데이터값
-        return Map.of();
+        return Map.of(); //Map.of();
     }
 }

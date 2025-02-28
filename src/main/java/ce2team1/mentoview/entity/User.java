@@ -42,14 +42,13 @@ public class User extends AuditingFields {
     @Column(nullable = true)
     private String providerId;// OAuth의 providerId
 
-    private boolean isSocial;
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    private String refreshToken;
+    private String billingKey;
 
-    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isSocial, UserStatus status, String refreshToken ) {
+    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status, String billingKey ) {
 
         return new User(
                 null,
@@ -59,7 +58,6 @@ public class User extends AuditingFields {
                 role != null ? role : Role.USER,  // 기본값: USER
                 socialProvider,
                 providerId,
-                isSocial,
                 status != null ? status : UserStatus.ACTIVE,  // 기본값: ACTIVE
                 null);
 
@@ -73,11 +71,16 @@ public class User extends AuditingFields {
                 .role(userDto.getRole())
                 .socialProvider(userDto.getSocialProvider())
                 .providerId(userDto.getProviderId())
-                .isSocial(userDto.isSocial())
                 .status(userDto.getStatus())
                 .build();
 
     }
+    // OAuth2용
+    public void updateSocialInfo(String newProviderId) {
+        this.providerId = newProviderId;
+    }
+
+
 
     @Override
     public final boolean equals(Object o) {
