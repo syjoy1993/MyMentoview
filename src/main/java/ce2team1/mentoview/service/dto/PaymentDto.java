@@ -1,11 +1,13 @@
 package ce2team1.mentoview.service.dto;
 
 import ce2team1.mentoview.entity.Payment;
+import ce2team1.mentoview.entity.Subscription;
 import ce2team1.mentoview.entity.atrribute.PaymentStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 /**
  * DTO for {@link Payment}
@@ -30,7 +32,7 @@ public class PaymentDto {
         return new PaymentDto(paymentId, amount, approvalCode, status, paymentDate, subId);
     }
 
-    private static PaymentDto toDto(Payment payment) {
+    public static PaymentDto toDto(Payment payment) {
         return PaymentDto.builder()
                 .paymentId(payment.getPaymentId())
                 .amount(payment.getAmount())
@@ -42,6 +44,28 @@ public class PaymentDto {
 
     }
 
+    public static PaymentDto checkToDto(PaymentCheckDto paymentCheckDto, Long subId) {
 
+        String paidAtString = paymentCheckDto.getPaidAt();
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.systemDefault());
+
+        return PaymentDto.of(
+                paymentCheckDto.getAmount().getTotal(),
+                paymentCheckDto.getTransactionId(),
+                PaymentStatus.SUCCESS,
+                localDateTime,
+                subId);
+    }
+
+    public Payment toEntity(Subscription subscription) {
+        return Payment.of(
+                this.amount,
+                this.approvalCode,
+                this.getStatus(),
+                this.getPaymentDate(),
+                subscription
+                );
+    }
 
 }
