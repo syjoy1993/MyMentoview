@@ -23,11 +23,9 @@ repositories {
     mavenCentral()
 }
 
-/*
 ext {
     set('springAiVersion', "1.0.0-M6")
 }
-*/
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -36,7 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    //implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -50,8 +48,17 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.2'
     implementation 'software.amazon.awssdk:s3'
 
+    //pdfBox
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.3'
+
     //swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+
+    //port-one
+    implementation("io.portone:server-sdk:0.15.0")
+
+    //webClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     //test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -59,11 +66,11 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-/*dependencyManagement {
+dependencyManagement {
     imports {
         mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
     }
-}*/
+}
 
 tasks.named('test') {
     useJUnitPlatform()
