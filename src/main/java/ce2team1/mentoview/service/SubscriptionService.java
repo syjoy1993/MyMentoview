@@ -48,27 +48,68 @@ public class SubscriptionService {
         subscription.modifyStatusToCanceled();
     }
 
-    public Long createSubscription(Long userId, PaymentCheckDto paymentCheckDto) {
+    @Transactional
+    public void deleteSubscriptionByPaymentId(String paymentId) {
+
+        // 삭제 시 디비에서 삭제하는 게 아니라 status를 변경
+        Subscription subscription = subscriptionRepository.findByPortonePaymentId(paymentId);
+        subscription.modifyStatusToCanceled();
+    }
+
+    public Subscription createSubscription(PaymentCheckDto paymentCheckDto) {
 
         // paidAt 포맷팅
         String paidAtString = paymentCheckDto.getPaidAt();
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME);
         LocalDate ld = zonedDateTime.toLocalDate();
 
-        System.out.println("유저를 못찾니?");
-        User user = userRepository.findById(userId).orElseThrow();
+        System.out.println("이제 유저 찾을 거");
+        User user = userRepository.findById(Long.valueOf(paymentCheckDto.getCustomer().getId())).orElseThrow();
+        System.out.println(user.getUserId());
 
-        Subscription subscription = subscriptionRepository.save(Subscription.of(
+        PaymentMethod paymentMethod = "KAKAOPAY".equals(paymentCheckDto.getMethod().getProvider())? PaymentMethod.KAKAO_PAY : PaymentMethod.CREDIT_CARD;
+        return subscriptionRepository.save(Subscription.of(
                                                                     SubscriptionStatus.ACTIVE,
                                                                     SubscriptionPlan.PREMIUM,
                                                                     ld,
                                                                     ld.plusDays(30),
                                                                     ld.plusDays(31),
-                                                                    PaymentMethod.KAKAO_PAY,
+                                                                    paymentMethod,
+                                                                    paymentCheckDto.getBillingKey(),
+                                                                    null,
+                                                                    null,
                                                                     user)
                                                                 );
-
-        return subscription.getSubId();
     }
 
+    public Long checkSubscription(Long uId) {
+
+        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+        System.out.println(subscription);
+
+        if (subscription != null) {
+            return subscription.getSubId();
+        }
+        return null;
+    }
+
+    @Transactional
+    public Subscription modifyEndDateAndNextBillingDate(Long subId, String paidAt) {
+
+        Subscription subscription = subscriptionRepository.findById(subId).orElseThrow();
+        subscription.modifyEndDateAndNextBillingDate(paidAt);
+
+        return subscription;
+    }
+
+    public String getBillingKey(Long sId) {
+        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+        return subscription.getBillingKey();
+    }
+
+    @Transactional
+    public void initPaymentScheduleIdAndPaymentId(Long uId, String paymentId, String scheduleId) {
+        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+        subscription.setPaymentIdAndScheduleId(paymentId, scheduleId);
+    }
 }
