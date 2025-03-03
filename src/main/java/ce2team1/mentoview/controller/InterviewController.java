@@ -1,7 +1,6 @@
 package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.request.InterviewCreate;
-import ce2team1.mentoview.controller.dto.request.ResponseCreate;
 import ce2team1.mentoview.controller.dto.request.ResponseUpdate;
 import ce2team1.mentoview.controller.dto.response.InterviewDetailResp;
 import ce2team1.mentoview.controller.dto.response.QuestionResp;
