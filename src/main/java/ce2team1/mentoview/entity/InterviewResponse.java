@@ -39,7 +39,10 @@ public class InterviewResponse extends AuditingFields {
         return new InterviewResponse (responseId, respUrl, response,answered, duration,question );
     }
 
-
+    // 변환 텍스트 업데이트
+    public void updateTranscription(String transcriptionText) {
+        this.response = transcriptionText;
+    }
 
 
 
