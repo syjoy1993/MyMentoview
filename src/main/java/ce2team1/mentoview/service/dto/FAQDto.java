@@ -20,7 +20,7 @@ public class FAQDto {
     public static FAQDto toDto(InterviewQuestion question) {
         return FAQDto.builder()
                 .questionId(question.getQuestionId())
-                .answer(question.getQuestion())
+                .question(question.getQuestion())
                 .feedback(question.getInterviewFeedback().getFeedback())
                 .answer(question.getInterviewResponse().getResponse())
                 .build();
