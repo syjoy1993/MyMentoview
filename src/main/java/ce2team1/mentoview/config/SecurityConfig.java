@@ -47,7 +47,7 @@ public class SecurityConfig {
         // 인가
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                        .requestMatchers("/api/test", "api/webhook/**", "api/subscription/**").permitAll()
+                        .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/swagger-ui/**","/v3/api-docs/**", "/swagger-resources/**").permitAll() //swagger
                         .requestMatchers("/", "/favicon.ico", "/static","/about","/contactus").permitAll()
                         .requestMatchers("/api/signup/**", "/api/login/**","/api/auth/google","/token/**").permitAll()
