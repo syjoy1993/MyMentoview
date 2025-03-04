@@ -58,8 +58,28 @@ public class Subscription extends AuditingFields {
 
     }
 
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Subscription that = (Subscription) o;
+        return getSubId() != null && Objects.equals(getSubId(), that.getSubId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
     public void modifyStatusToCanceled() {
         this.status = SubscriptionStatus.CANCELED;
+    }
+
+    public void modifyStatusToExpiry() {
+        this.status = SubscriptionStatus.EXPIRY;
     }
 
     public void modifyEndDateAndNextBillingDate(String paidAt) {
@@ -76,20 +96,8 @@ public class Subscription extends AuditingFields {
         this.portoneScheduleId = portoneScheduleId;
     }
 
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        Subscription that = (Subscription) o;
-        return getSubId() != null && Objects.equals(getSubId(), that.getSubId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    public void modifyBillingKey(String billingKey) {
+        this.billingKey = billingKey;
     }
 
 }

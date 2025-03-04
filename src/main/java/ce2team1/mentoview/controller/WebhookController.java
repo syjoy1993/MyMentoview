@@ -108,7 +108,8 @@ public class WebhookController {
             // 빌링키 조회
             BillingKeyCheckDto billingKeyCheckDto = portonePaymentService.checkBillingKey(payload.getData().getBillingKey());
 
-
+            // 빌링키 변경 처리
+            portonePaymentService.processChangingBillingKey(billingKeyCheckDto);
         }
 
         return ResponseEntity.ok("Webhook received successfully.");

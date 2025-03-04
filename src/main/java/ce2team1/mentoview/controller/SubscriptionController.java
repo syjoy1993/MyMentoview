@@ -8,7 +8,6 @@ import ce2team1.mentoview.service.PortonePaymentService;
 import ce2team1.mentoview.service.SubscriptionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class SubscriptionController {
         Long userId = mvPrincipalDetails.getUserId();
 //        Long userId = 1L;
 
-        List<SubscriptionResp> subscriptions = subscriptionService.getSubscription(userId);
+        List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
             List<PaymentResp> payments = paymentService.getPayment(subscriptionResp.getSubId());
             subscriptionResp.setPayments(payments);
@@ -41,7 +40,7 @@ public class SubscriptionController {
     @DeleteMapping("/subscription/{subscription_id}")
     public void deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
         Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+//        Long uId = 2L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
