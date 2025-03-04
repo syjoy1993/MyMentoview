@@ -9,10 +9,12 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,8 @@ public class AiService {
         return result;
     }
 
-    public FeedbackDto getFeedbackFromQA(GenerateFeedbackDto request) {
+    @Async(value = "generateFeedbackExecutor")
+    public CompletableFuture<FeedbackDto> generateFeedbackFromQA(GenerateFeedbackDto request) {
         Message systemMessage =
                 new SystemMessage("너는 이제부터 한국어로 답변해주는 면접관이 되는거야. " +
                         "너가 제공한 면접 질문은 아래와 같아. \n" +
@@ -53,6 +56,6 @@ public class AiService {
 
         String feedback = response.getResult().getOutput().getText().replaceAll("\n", "").trim();
 
-        return FeedbackDto.of(feedback, 10, request.getQuestionId());
+        return CompletableFuture.completedFuture(FeedbackDto.of(feedback, 10, request.getQuestionId()));
     }
 }

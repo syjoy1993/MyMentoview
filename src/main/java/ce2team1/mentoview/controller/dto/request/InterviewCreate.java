@@ -18,8 +18,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InterviewCreate {
     @NotNull
+    @Builder.Default
     private InterviewStatus interviewStatus = InterviewStatus.QUESTION_CREATED;
     @NotNull
+    @Builder.Default
     private InterviewType interviewType = InterviewType.VOICE;
     @NotNull
     private Long resumeId;

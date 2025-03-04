@@ -1,9 +1,9 @@
 package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.request.InterviewCreate;
+import ce2team1.mentoview.controller.dto.request.ResponseUpdate;
 import ce2team1.mentoview.controller.dto.response.InterviewDetailResp;
 import ce2team1.mentoview.controller.dto.response.QuestionResp;
-import ce2team1.mentoview.entity.Interview;
 import ce2team1.mentoview.service.InterviewService;
 import ce2team1.mentoview.service.ResponseService;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +68,15 @@ public class InterviewController {
         return ResponseEntity.ok("");
     }
 
+    // 면접 응답 업데이트
+    @PostMapping("/interview/response/transcription")
+    public ResponseEntity<Void> updateTranscription(@RequestBody ResponseUpdate responseUpdate) {
+
+        responseService.updateTranscriptionAndGenerateFeedback(responseUpdate);
+        return ResponseEntity.ok().build();
+    }
+
+    // 면접 삭제
     @DeleteMapping("/interview/{interview_id}")
     public void deleteInterview(@PathVariable("interview_id") Long id) {
         interviewService.deleteInterview(id);

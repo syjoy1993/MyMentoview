@@ -69,12 +69,7 @@ public class AwsS3Service {
 
     // 외부 호출 S3 다운로드 메소드
     public File downloadS3ToLocal(String key, String localDir) throws IOException {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
-
-        ResponseInputStream<GetObjectResponse> s3ObjectResponseInputStream = s3Client.getObject(getObjectRequest);
+        ResponseInputStream<GetObjectResponse> s3ObjectResponseInputStream = getS3ObjectInputStream(key);
         String fileName = new File(key).getName();
         File localFile = new File(localDir, fileName);
 
@@ -86,6 +81,16 @@ public class AwsS3Service {
             }
         }
         return localFile;
+    }
+
+    // s3 파일 InputStream 으로 불러오는 메소드
+    public ResponseInputStream<GetObjectResponse> getS3ObjectInputStream(String key) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        return s3Client.getObject(getObjectRequest);
     }
 
     // 외부 호출 s3 삭제 메소드
