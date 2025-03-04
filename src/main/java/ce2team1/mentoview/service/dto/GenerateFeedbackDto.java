@@ -11,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GenerateFeedbackDto {
+    private Long interviewId;
     private Long questionId;
     private String question;
     private String answer;

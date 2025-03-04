@@ -47,6 +47,10 @@ public class Interview extends AuditingFields {
 
     }
 
+    public void updateStatus(InterviewStatus status) {
+        this.interviewStatus = status;
+    }
+
 
     @Override
     public final boolean equals(Object o) {
