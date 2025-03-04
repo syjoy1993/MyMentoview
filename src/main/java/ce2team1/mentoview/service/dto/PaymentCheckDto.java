@@ -12,8 +12,10 @@ public class PaymentCheckDto {
     private String status; // 결제 상태
     private String currency; // 결제통화 구분코드
     private String transactionId; // 승인번호
+    private String billingKey;
     private String paidAt; // 결제 일시
     private Method method; // 결제방법
+    private Customer customer; // 사용자 정보
 
     @Getter
     public static class Method {
@@ -21,6 +23,8 @@ public class PaymentCheckDto {
         private String provider;
         private EasyPayMethod easyPayMethod;
     }
+
+    @Getter
     public static class EasyPayMethod {
         private String type;
     }
@@ -34,6 +38,11 @@ public class PaymentCheckDto {
         private BigDecimal discount; // 할인
         private BigDecimal paid; // 결제된 금액
         private BigDecimal cancelled; // 취소된 금액
+    }
+
+    @Getter
+    public static class Customer {
+        private String id;
     }
 }
 
