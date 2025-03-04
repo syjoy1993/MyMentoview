@@ -11,6 +11,7 @@ public class BillingKeyCheckDto {
     private String merchantId;
     private String storeId;
     private List<Channel> channels;
+    private Customer customer;
     private String issuedAt;
     private String deletedAt;
 
@@ -19,6 +20,11 @@ public class BillingKeyCheckDto {
         private String type;
         private String pgProvider;
         private String pgMerchatId;
+    }
+
+    @Getter
+    public static class Customer {
+        private String id;
     }
 
 }

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DTO for {@link ce2team1.mentoview.entity.Subscription}
@@ -28,6 +29,7 @@ public class SubscriptionResp {
     LocalDate nextBillingDate;
     String paymentMethod;
     Long userId;
+    List<PaymentResp> payments;
 
     public static SubscriptionResp toResp(SubscriptionDto dto) {
         return SubscriptionResp.builder()
@@ -41,5 +43,9 @@ public class SubscriptionResp {
                 .userId(dto.getUserId())
                 .build();
 
+    }
+
+    public void setPayments(List<PaymentResp> payments) {
+        this.payments = payments;
     }
 }
