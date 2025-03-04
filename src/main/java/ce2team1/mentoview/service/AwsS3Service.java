@@ -45,18 +45,19 @@ public class AwsS3Service {
         return RequestBody.fromInputStream(file.getInputStream(), file.getSize());
     }
 
-    // S3Utilities를 통해 GetUrlRequest를 파라미터로 넣어 파라미터로 넘어온 key의 접근 경로를 URL로 반환받아 경로를 사용
-    private String findUploadKeyUrl (String key) {
-        S3Utilities s3Utilities = s3Client.utilities();
-        GetUrlRequest request = GetUrlRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
-
-        URL url = s3Utilities.getUrl(request);
-
-        return url.toString();
-    }
+    // 서비스에서 전체 url 값 사용 X, 주석처리 해두고 추후 삭제하거나 필요 시 주석 해제
+//    // S3Utilities를 통해 GetUrlRequest를 파라미터로 넣어 파라미터로 넘어온 key의 접근 경로를 URL로 반환받아 경로를 사용
+//    private String findUploadKeyUrl (String key) {
+//        S3Utilities s3Utilities = s3Client.utilities();
+//        GetUrlRequest request = GetUrlRequest.builder()
+//                .bucket(bucketName)
+//                .key(key)
+//                .build();
+//
+//        URL url = s3Utilities.getUrl(request);
+//
+//        return url.toString();
+//    }
 
     // S3로 파일 업로드 메소드
     private String putS3(MultipartFile file, String key) throws IOException {
@@ -64,24 +65,25 @@ public class AwsS3Service {
         RequestBody rb = getFileRequestBody(file);
         s3Client.putObject(objectRequest, rb);
 
-        return findUploadKeyUrl(key);
+        return key;
     }
 
-    // 외부 호출 S3 다운로드 메소드
-    public File downloadS3ToLocal(String key, String localDir) throws IOException {
-        ResponseInputStream<GetObjectResponse> s3ObjectResponseInputStream = getS3ObjectInputStream(key);
-        String fileName = new File(key).getName();
-        File localFile = new File(localDir, fileName);
-
-        try (FileOutputStream fos = new FileOutputStream(localFile)) {
-            byte[] readBuffer = new byte[1024];
-            int readLength;
-            while ((readLength = s3ObjectResponseInputStream.read(readBuffer)) > 0) {
-                fos.write(readBuffer, 0, readLength);
-            }
-        }
-        return localFile;
-    }
+    // 서비스에서 다운로드 사용 X, 주석처리 해두고 추후 삭제하거나 필요 시 주석 해제
+//    // 외부 호출 S3 다운로드 메소드
+//    public File downloadS3ToLocal(String key, String localDir) throws IOException {
+//        ResponseInputStream<GetObjectResponse> s3ObjectResponseInputStream = getS3ObjectInputStream(key);
+//        String fileName = new File(key).getName();
+//        File localFile = new File(localDir, fileName);
+//
+//        try (FileOutputStream fos = new FileOutputStream(localFile)) {
+//            byte[] readBuffer = new byte[1024];
+//            int readLength;
+//            while ((readLength = s3ObjectResponseInputStream.read(readBuffer)) > 0) {
+//                fos.write(readBuffer, 0, readLength);
+//            }
+//        }
+//        return localFile;
+//    }
 
     // s3 파일 InputStream 으로 불러오는 메소드
     public ResponseInputStream<GetObjectResponse> getS3ObjectInputStream(String key) {
