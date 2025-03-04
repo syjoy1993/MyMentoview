@@ -26,8 +26,8 @@ public class SubscriptionController {
     @GetMapping("/subscription")
     public List<SubscriptionResp> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-//        Long userId = mvPrincipalDetails.getUserId();
-        Long userId = 1L;
+        Long userId = mvPrincipalDetails.getUserId();
+//        Long userId = 1L;
 
         List<SubscriptionResp> subscriptions = subscriptionService.getSubscription(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
@@ -40,8 +40,8 @@ public class SubscriptionController {
 
     @DeleteMapping("/subscription/{subscription_id}")
     public void deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
-//        Long uId = mvPrincipalDetails.getUserId();
-        Long uId = 1L;
+        Long uId = mvPrincipalDetails.getUserId();
+//        Long uId = 1L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
