@@ -6,11 +6,15 @@ import ce2team1.mentoview.controller.dto.response.InterviewDetailResp;
 import ce2team1.mentoview.controller.dto.response.QuestionResp;
 import ce2team1.mentoview.service.InterviewService;
 import ce2team1.mentoview.service.ResponseService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,13 +63,33 @@ public class InterviewController {
     }
 
     // 면접 종료
+    // 프론트 API 연동 시 파라미터 다시 수정!
     @PostMapping("/interview/end")
-    public ResponseEntity<?> createInterviewResponse(@RequestParam(name = "files") Map<Long, MultipartFile> files) {
+    public ResponseEntity<?> createInterviewResponse(
+//            @RequestParam(name = "files") Map<Long, MultipartFile> files
+            @RequestPart("fileData") String fileData,
+            @RequestPart("files") List<MultipartFile> files) throws JsonProcessingException {
+
+        // JSON 데이터를 Map으로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<Long, String> fileMapping = objectMapper.readValue(fileData, new TypeReference<>() {});
+        Map<Long, MultipartFile> fileMap = new HashMap<>();
+
+        // 파일과 매핑된 ID 출력 및 파라미터 변환
+        for (int i = 0; i < files.size(); i++) {
+            long qid = Long.parseLong(fileMapping.get((long) i + 1));
+            MultipartFile voiceFile = files.get(i);
+
+            System.out.println("ID: " + qid + ", File: " + voiceFile.getOriginalFilename());
+
+            fileMap.put(qid, voiceFile);
+        }
 
         // 면접 답변 객체 생성 및 저장
-        responseService.createResponse(files);
+//        responseService.createResponse(files);
+        responseService.createResponse(fileMap);
 
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok().build();
     }
 
     // 면접 응답 업데이트
