@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.transcribe.TranscribeClient;
 
 @Configuration
 public class AwsConfig {
@@ -32,6 +33,14 @@ public class AwsConfig {
         return S3Client.builder()
                 .region(Region.of(awsRegion)) //AWS 리전 설정
                 // 파라미터로 전달된 awsCredentials를 사용하여 자격증명공급자 설정
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .build();
+    }
+
+    @Bean
+    public TranscribeClient transcribeClient(AwsCredentials awsCredentials) {
+        return TranscribeClient.builder()
+                .region(Region.AP_NORTHEAST_2)
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
     }

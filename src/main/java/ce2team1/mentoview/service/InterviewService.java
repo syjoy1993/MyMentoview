@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,11 +27,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional
 public class InterviewService {
+
     private final InterviewRepository interviewRepository;
     private final InterviewQuestionRepository questionRepository;
     private final ResumeRepository resumeRepository;
-//    private final PdfService pdfService;
-//    private final AiService aiService;
+
+    private final PdfService pdfService;
+    private final AiService aiService;
+    private final AwsS3Service s3Service;
+
+    private static final String PDF_EXTENSION = ".pdf";
+
 
     // 인터뷰 ID로 faq 정보 조회
     @Transactional(readOnly = true)
@@ -46,7 +53,8 @@ public class InterviewService {
         }
 
         // 인터뷰 하위 항목 가져오기
-        List<InterviewQuestion> questionList = questionRepository.findQuestionsWithResponsesAndFeedback(interview.getInterviewId());
+        List<InterviewQuestion> questionList = questionRepository
+                .findQuestionsWithResponsesAndFeedback(interview.getInterviewId());
 
         // 반환할 List<InterviewDetailResp> 생성
         List<FAQDto> faqList = new ArrayList<>();
@@ -69,60 +77,79 @@ public class InterviewService {
     }
 
     // 면접 시작 -> 면접 객체 생성 -> 면접 질문 생성
-    public List<QuestionDto> createInterviewQuestion(InterviewCreate interviewCreate) {
+    public List<QuestionDto> createInterviewQuestion(InterviewCreate request) {
 
-        // 이력서 가져오기
-        Resume resume = resumeRepository.findById(interviewCreate.getResumeId())
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+        // 이력서 조회
+        Resume resume = resumeRepository.findById(request.getResumeId())
+                .orElseThrow(() -> new IllegalArgumentException("Resume not found with ID: " + request.getResumeId()));
 
         // 인터뷰 생성
-        Interview interview = Interview.of(InterviewStatus.QUESTION_CREATED,
-                interviewCreate.getInterviewType(),
-                resume);
+        Interview savedInterview = createAndSaveInterview(request, resume);
 
-        Interview saveInterview = interviewRepository.save(interview);
+        // 이력서 파일에서 텍스트 추출
+        String extractedText = extractResumeTextFromS3(resume.getFileUrl());
 
-        // S3에서 이력서 pdf 가져오기
-//        ResponseInputStream<?> is = s3Service.getResumeFile(resume.getFileUrl());
-
-
-        // 가져온 이력서 텍스트 변환 (pdf box)
-//        String textFromPDF;
-//
-//        try {
-//            textFromPDF = pdfService.extractTextFromPDF(is);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("Failed to extract text from PDF");
-//        }
-
-        // 변환된 텍스트로 질문 생성
-//        Map<Integer, String> questionFromResume = aiService.getInterviewQuestionFromResume(textFromPDF);
-
-
-        // 생성된 질문 5개 저장
-//        List<InterviewQuestion> questionList = new ArrayList<>();
-//        for (String questionText : questionFromResume.values()) {
-//            InterviewQuestion question = InterviewQuestion.of(questionText, Difficulty.EASY, saveInterview);
-//            questionList.add(question);
-//        }
-
-//        List<InterviewQuestion> saveQuestions = questionRepository.saveAll(questionList);
-
-        // 질문 response 변환 후 반환 (List<QuestionDto>)
-//        return saveQuestions.stream().map(sq -> QuestionDto.builder()
-//                .questionId(sq.getQuestionId())
-//                .question(sq.getQuestion())
-//                .interviewId(sq.getInterview().getInterviewId())
-//                .build())
-//                .toList();
-        return new ArrayList<>();
+        // 면접 질문 생성 후 DTO 타입 변환
+        return generateAndSaveInterviewQuestions(extractedText, savedInterview);
     }
 
+    // 인터뷰 삭제
     public void deleteInterview(Long interviewId) {
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(() -> new RuntimeException("Interview not found"));
 
         interviewRepository.delete(interview);
+    }
+
+    // 인터뷰 생성 및 저장
+    private Interview createAndSaveInterview(InterviewCreate request, Resume resume) {
+        Interview interview = Interview.of(
+                InterviewStatus.QUESTION_CREATED,
+                request.getInterviewType(),
+                resume
+        );
+
+        return interviewRepository.save(interview);
+    }
+
+    // S3에서 PDF 텍스트 추출
+    private String extractResumeTextFromS3(String fileKey) {
+
+        // 확장자 확인
+        if (!fileKey.contains(PDF_EXTENSION)) {
+            throw new IllegalArgumentException("Wrong file format: " + fileKey);
+        }
+
+        // pdf 에서 텍스트 추출
+        try (ResponseInputStream<GetObjectResponse> s3InputStream = getFileInputStreamFromS3(fileKey)) {
+            return pdfService.extractTextFromPDF(s3InputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to extract text from PDF", e);
+        }
+    }
+
+    // S3 에서 PDF 파일 InputStream 타입으로 가져오기
+    private ResponseInputStream<GetObjectResponse> getFileInputStreamFromS3(String fileUrl) {
+        return s3Service.getS3ObjectInputStream(fileUrl);
+    }
+
+    // 질문 생성 및 저장
+    private List<QuestionDto> generateAndSaveInterviewQuestions(String textFromPDF, Interview interview) {
+
+        // AI 질문 생성
+        Map<Integer, String> questions = aiService.getInterviewQuestionFromResume(textFromPDF);
+
+        // 질문 객체 리스트 생성
+        List<InterviewQuestion> questionEntityList = questions.values().stream()
+                .map(questionText -> InterviewQuestion.of(questionText, Difficulty.EASY, interview))
+                .toList();
+
+        return questionRepository.saveAll(questionEntityList).stream()
+                .map(question -> QuestionDto.builder()
+                        .questionId(question.getQuestionId())
+                        .question(question.getQuestion())
+                        .interviewId(question.getInterview().getInterviewId())
+                        .build())
+                .toList();
     }
 }

@@ -35,6 +35,10 @@ public class InterviewQuestion extends AuditingFields {
     @OneToOne(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private InterviewFeedback interviewFeedback;
 
+    public static InterviewQuestion of(Long questionId) {
+        return new InterviewQuestion(questionId, null, null, null, null, null);
+    }
+
     public static InterviewQuestion of(String question, Difficulty difficulty, Interview interview) {
         return new InterviewQuestion (null, question, difficulty, interview, null, null);
 

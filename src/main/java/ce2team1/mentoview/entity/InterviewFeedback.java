@@ -30,10 +30,16 @@ public class InterviewFeedback extends AuditingFields {
     @JoinColumn(name = "question_id", nullable = false, unique = true)
     private InterviewQuestion question;
 
+
     public static InterviewFeedback of(String feedback, Integer score ,  InterviewQuestion question) {
         return new InterviewFeedback (null, feedback, score, question);
 
     }
+
+    public static InterviewFeedback of(String feedback, Integer score, Long questionId) {
+        return new InterviewFeedback (null, feedback, score, InterviewQuestion.of(questionId));
+    }
+
     public static InterviewFeedback of(Long feedbackId, String feedback, Integer score ,  InterviewQuestion question) {
         return new InterviewFeedback (feedbackId, feedback, score, question);
 
