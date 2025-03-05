@@ -1,9 +1,11 @@
 package ce2team1.mentoview.service;
 
 import ce2team1.mentoview.controller.dto.request.PaymentCreate;
+import ce2team1.mentoview.entity.Subscription;
 import ce2team1.mentoview.service.dto.BillingKeyCheckDto;
 import ce2team1.mentoview.service.dto.PaymentCheckDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,15 +33,17 @@ public class PortonePaymentService {
 
     @Value("${IMP_API_KEY}")
     private String portoneApiSecret; // PortOne API 시크릿
-    private String baseUrl = "https://api.portone.io/";
-    private String notificationUrl = "https://f536-180-69-98-167.ngrok-free.app/api/webhook/payment";
+    private String baseUrl = "https://api.portone.io";
+
+    @Value("${NOTIFICATION_URL}")
+    private String notificationUrl; // 포트원이 웹훅 전달할 URL
 
     public boolean checkPayment(PaymentCreate paymentCreate) throws JsonProcessingException {
 
         String encodedPaymentId = URLEncoder.encode(paymentCreate.getData().getPaymentId(), StandardCharsets.UTF_8);
 
         PaymentCheckDto paymentCheckDto = webClient.get()
-                .uri(baseUrl + "payments/" + encodedPaymentId)
+                .uri(baseUrl + "/payments/" + encodedPaymentId)
                 .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret))
                 .retrieve()
                 .bodyToMono(PaymentCheckDto.class)
@@ -61,22 +65,37 @@ public class PortonePaymentService {
             // 유효한 결제일 경우, 구독 생성 및 결제 저장
             paymentService.createPayment(paymentCheckDto);
             // 다음 결제 예약
-            schedulePayment(Long.valueOf(paymentCheckDto.getCustomer().getId()), paymentCheckDto.getBillingKey(), paymentCheckDto.getPaidAt());
+            schedulePayment(Long.valueOf(paymentCheckDto.getCustomer().getId()), paymentCheckDto.getBillingKey(), paymentCheckDto.getPaidAt(), null);
         } else {
             throw new RuntimeException("Payment amount mismatch detected");
         }
     }
 
-    private void schedulePayment(Long uId, String billingKey, String paidAt) throws JsonProcessingException {
+    private void schedulePayment(Long uId, String billingKey, String paidAt, String willPayAt) throws JsonProcessingException {
 
         String paymentId = "payment-" + UUID.randomUUID().toString();
         String encodedPaymentId = URLEncoder.encode(paymentId, StandardCharsets.UTF_8);
 
+
+        OffsetDateTime paymentDateByPaidAt = null;
+        OffsetDateTime paymentDateByWillPayAt = null;
+        if (paidAt != null) {
+            paymentDateByPaidAt = OffsetDateTime.parse(paidAt)
+                    .plusDays(31) // 31일 추가
+                    .withOffsetSameInstant(ZoneOffset.of("+09:00")); // KST로 설정
+        } else {
+            paymentDateByWillPayAt = OffsetDateTime.parse(willPayAt)
+                    .withOffsetSameInstant(ZoneOffset.of("+09:00"));
+        }
+
+        OffsetDateTime paymentDate = willPayAt == null ? paymentDateByPaidAt : paymentDateByWillPayAt;
+        System.out.println(paymentDate);
+
         String response = webClient.post()
-                .uri(baseUrl + "payments/{paymentId}/schedule", encodedPaymentId)
+                .uri(baseUrl + "/payments/{paymentId}/schedule", encodedPaymentId)
                 .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(createRequestBodyForSchedulingPayment(uId, billingKey, paidAt))
+                .bodyValue(createRequestBodyForSchedulingPayment(uId, billingKey, paymentDate))
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnError(error -> System.out.println("결제 예약 요청 실패: " + error.getMessage()))
@@ -87,7 +106,7 @@ public class PortonePaymentService {
         subscriptionService.initPaymentScheduleIdAndPaymentId(uId, paymentId, scheduleId);
     }
 
-    private String createRequestBodyForSchedulingPayment(Long uId, String billingKey, String paidAt) throws JsonProcessingException {
+    private String createRequestBodyForSchedulingPayment(Long uId, String billingKey, OffsetDateTime dateTime) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -111,13 +130,6 @@ public class PortonePaymentService {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("payment", paymentDetails);
 
-        // paidAt 포맷팅
-//        OffsetDateTime dateTime = OffsetDateTime.parse(paidAt)
-//                .plusDays(31)  // 31일 추가
-//                .withOffsetSameInstant(ZoneOffset.of("+09:00")); // KST로 설정
-        OffsetDateTime dateTime = OffsetDateTime.parse(paidAt)
-                .plusMinutes(2)  // 2분 후에
-                .withOffsetSameInstant(ZoneOffset.of("+09:00")); // KST로 설정
         String formattedTime = dateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         requestBody.put("timeToPay", formattedTime);
 
@@ -132,7 +144,7 @@ public class PortonePaymentService {
         String encodedBillingKey = URLEncoder.encode(billingKey, StandardCharsets.UTF_8);
 
         BillingKeyCheckDto response = webClient.get()
-                .uri(baseUrl + "billing-keys/{billingKey}", encodedBillingKey)
+                .uri(baseUrl + "/billing-keys/{billingKey}", encodedBillingKey)
                 .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret))
                 .retrieve()
                 .bodyToMono(BillingKeyCheckDto.class)
@@ -163,7 +175,7 @@ public class PortonePaymentService {
         String encodedPaymentId = URLEncoder.encode(paymentId, StandardCharsets.UTF_8);
 
         String response = webClient.post()
-                .uri(baseUrl + "payments/{paymentId}/billing-key", encodedPaymentId)
+                .uri(baseUrl + "/payments/{paymentId}/billing-key", encodedPaymentId)
                 .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .bodyValue(createRequestBodyForCreatingPayment(uId, billingKey))
@@ -208,13 +220,34 @@ public class PortonePaymentService {
         String billingKey = subscriptionService.getBillingKey(sId);
 
         String response = webClient.method(HttpMethod.DELETE) // DELETE 요청
-                .uri(baseUrl + "payment-schedules") // URL 설정
+                .uri(baseUrl + "/payment-schedules") // URL 설정
                 .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret)) // 인증 헤더 추가
                 .bodyValue(createRequestBodyForCancelScheduling(billingKey)) // JSON Body 추가
                 .retrieve()
                 .bodyToMono(String.class)
+                .doOnError(error -> System.out.println("결제 취소 요청 실패: " + error.getMessage()))
                 .block();
 
+//        // JSON body 생성
+//        String jsonBody = createRequestBodyForCancelScheduling(billingKey);
+//
+//        // JSON을 URL 인코딩
+//        String encodedJsonBody = URLEncoder.encode(jsonBody, StandardCharsets.UTF_8);
+//
+//        String response = webClient.delete()
+//                .uri(uriBuilder -> uriBuilder
+//                        .scheme("https")  // 프로토콜 명시
+//                        .host("api.portone.io")
+//                        .path("/payment-schedules")
+//                        .queryParam("requestBody", encodedJsonBody) // JSON을 쿼리 파라미터로 전달
+//                        .build())
+//                .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret)) // 인증 헤더 추가
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .doOnError(error -> System.out.println("결제 취소 요청 실패: " + error.getMessage()))
+//                .block();
+
+        System.out.println(response);
 
     }
 
@@ -228,5 +261,45 @@ public class PortonePaymentService {
         System.out.println(response);
 
         return response;
+    }
+
+    public void processChangingBillingKey(BillingKeyCheckDto billingKeyCheckDto) throws JsonProcessingException {
+
+        // 구독 조회
+        Subscription subscription = subscriptionService.getSubscriptionByUserId(Long.valueOf(billingKeyCheckDto.getCustomer().getId()));
+
+        // 구독의 portoneScheduleId값을 통해 결제 예약 조회해서 이전 예약 시간 가져옴
+        String timeToPay = getScheduling(subscription.getPortoneScheduleId());
+
+        // 빌링키로 기존 결제 예약 취소
+        cancelScheduling(subscription.getSubId());
+
+        // 새로운 빌링키로 다시 결제 예약
+        schedulePayment(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey(), null, timeToPay);
+
+        // 구독의 빌링키 변경
+        subscriptionService.modifyBillingKey(subscription.getSubId(), billingKeyCheckDto.getBillingKey());
+
+    }
+
+    private String getScheduling(String portoneScheduleId) throws JsonProcessingException {
+
+        String encodedScheduleId = URLEncoder.encode(portoneScheduleId, StandardCharsets.UTF_8);
+
+        String response = webClient.get()
+                .uri(baseUrl + "/payment-schedules/" + encodedScheduleId)
+                .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret))
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnError(error -> System.out.println("결제 예약 조회 실패: " + error.getMessage()))
+                .block(); // 동기 방식 호출
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response);
+
+        String timeToPay = rootNode.get("timeToPay").asText();
+        return timeToPay;
+
     }
 }

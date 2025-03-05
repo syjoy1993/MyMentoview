@@ -24,24 +24,24 @@ public class SubscriptionController {
     private final PortonePaymentService portonePaymentService;
 
     @GetMapping("/subscription")
-    public List<SubscriptionResp> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
+    public ResponseEntity<List<SubscriptionResp>> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
         Long userId = mvPrincipalDetails.getUserId();
 //        Long userId = 1L;
 
-        List<SubscriptionResp> subscriptions = subscriptionService.getSubscription(userId);
+        List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
             List<PaymentResp> payments = paymentService.getPayment(subscriptionResp.getSubId());
             subscriptionResp.setPayments(payments);
         }
 
-        return subscriptions;
+        return ResponseEntity.ok(subscriptions);
     }
 
     @DeleteMapping("/subscription/{subscription_id}")
-    public void deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
+    public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
         Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+//        Long uId = 2L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
@@ -51,5 +51,7 @@ public class SubscriptionController {
             // 구독의 상태 변경
             subscriptionService.deleteSubscription(sId);
         }
+        return ResponseEntity.ok("구독 해지 성공");
+
     }
 }

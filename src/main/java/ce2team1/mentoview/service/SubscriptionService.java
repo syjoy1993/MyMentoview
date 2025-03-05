@@ -28,7 +28,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
 
-    public List<SubscriptionResp> getSubscription(Long uId) {
+    public List<SubscriptionResp> getSubscriptions(Long uId) {
 
         return subscriptionRepository.findAllByUserId(uId)
                                     .stream()
@@ -53,7 +53,7 @@ public class SubscriptionService {
 
         // 삭제 시 디비에서 삭제하는 게 아니라 status를 변경
         Subscription subscription = subscriptionRepository.findByPortonePaymentId(paymentId);
-        subscription.modifyStatusToCanceled();
+        subscription.modifyStatusToExpiry();
     }
 
     public Subscription createSubscription(PaymentCheckDto paymentCheckDto) {
@@ -111,5 +111,18 @@ public class SubscriptionService {
     public void initPaymentScheduleIdAndPaymentId(Long uId, String paymentId, String scheduleId) {
         Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
         subscription.setPaymentIdAndScheduleId(paymentId, scheduleId);
+    }
+
+    public Subscription getSubscriptionByUserId(Long uId) {
+        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+
+        return subscription;
+    }
+
+    @Transactional
+    public void modifyBillingKey(Long sId, String billingKey) {
+
+        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+        subscription.modifyBillingKey(billingKey);
     }
 }
