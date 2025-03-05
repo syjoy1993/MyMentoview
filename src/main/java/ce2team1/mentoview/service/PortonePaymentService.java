@@ -34,7 +34,9 @@ public class PortonePaymentService {
     @Value("${IMP_API_KEY}")
     private String portoneApiSecret; // PortOne API 시크릿
     private String baseUrl = "https://api.portone.io";
-    private String notificationUrl = "https://27e5-180-69-98-167.ngrok-free.app/api/webhook/payment";
+
+    @Value("${NOTIFICATION_URL}")
+    private String notificationUrl; // 포트원이 웹훅 전달할 URL
 
     public boolean checkPayment(PaymentCreate paymentCreate) throws JsonProcessingException {
 
