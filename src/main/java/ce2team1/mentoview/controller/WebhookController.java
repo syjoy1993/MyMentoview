@@ -7,6 +7,10 @@ import ce2team1.mentoview.service.SubscriptionService;
 import ce2team1.mentoview.service.WebhookService;
 import ce2team1.mentoview.service.dto.BillingKeyCheckDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/webhook")
+@Tag(name = "Webhook API", description = "포트원 서버의 웹훅을 전달받을 API (빌링키 발급, 결제 처리)")
 @RequiredArgsConstructor
 public class WebhookController {
 
@@ -22,6 +27,10 @@ public class WebhookController {
     private final PortonePaymentService portonePaymentService;
     private final SubscriptionService subscriptionService;
 
+    @Operation(summary = "결제 발생", description = "포트원 서버에서 결제가 발생하면, 결제를 저장한 후 다음 결제를 예약합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "웹훅 검증 성공")
+    })
     @PostMapping("/payment")
     public ResponseEntity<?> createPayment(@RequestBody PaymentCreate payload,
                                            @RequestHeader Map<String, String> headers) throws JsonProcessingException {
@@ -61,7 +70,10 @@ public class WebhookController {
         return ResponseEntity.ok("Webhook received successfully.");
     }
 
-
+    @Operation(summary = "구독 요청으로 빌링키 발급", description = "포트원 서버에서 빌링키가 발급되면, 해당 빌링키를 사용해서 결제 요청을 보냅니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "웹훅 검증 성공")
+    })
     @PostMapping("/billingkey")
     public ResponseEntity<?> createBillingKey(@RequestBody BillingKeyCreate payload,
                                               @RequestHeader Map<String, String> headers) throws JsonProcessingException {
@@ -89,6 +101,10 @@ public class WebhookController {
         return ResponseEntity.ok("Webhook received successfully.");
     }
 
+    @Operation(summary = "결제 수단 변경으로 빌링키 발급", description = "포트원 서버에서 빌링키가 발급되면, 기존 결제 예약을 취소하고 새로 발급된 빌링키로 다시 결제를 예약합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "웹훅 검증 성공")
+    })
     @PostMapping("/billingkey/modify")
     public ResponseEntity<?> modifyBillingKey(@RequestBody BillingKeyCreate payload,
                                               @RequestHeader Map<String, String> headers) throws JsonProcessingException {
