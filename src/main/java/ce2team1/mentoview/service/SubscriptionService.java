@@ -125,4 +125,9 @@ public class SubscriptionService {
         Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
         subscription.modifyBillingKey(billingKey);
     }
+
+    public List<Subscription> findCanceledSubscriptionsOfToday(LocalDate today) {
+
+        return subscriptionRepository.findByStatusAndNextBillingDate(today);
+    }
 }

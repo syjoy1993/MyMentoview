@@ -39,11 +39,11 @@ public class Subscription extends AuditingFields {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    private String billingKey;
+    private String billingKey; // 구독 결제에 사용된 빌링키
 
-    private String portonePaymentId;
+    private String portonePaymentId; // 다음 결제 예약 건의 거래 id : 결제 실패 시 필요
 
-    private String portoneScheduleId;
+    private String portoneScheduleId; // 결제 예약 건 id : 결제 수단 변경 시 필요
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
