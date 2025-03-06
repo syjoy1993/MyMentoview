@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,7 +30,8 @@ public class AwsS3Service {
 
     // 외부 호출 S3 업로드 메소드
     public String uploadS3(MultipartFile multipartFile, String targetDir) throws IOException {
-        return this.putS3(multipartFile, targetDir + "/" + multipartFile.getOriginalFilename());
+        String uuid = UUID.randomUUID().toString().substring(0, 8);
+        return this.putS3(multipartFile, targetDir + "/" + uuid + "_" + multipartFile.getOriginalFilename());
     }
 
     // 파일 업로드를 하기위한 PutObjectRequest 반환
@@ -68,8 +70,9 @@ public class AwsS3Service {
         return key;
     }
 
-    // 서비스에서 다운로드 사용 X, 주석처리 해두고 추후 삭제하거나 필요 시 주석 해제
-//    // 외부 호출 S3 다운로드 메소드
+
+//    서비스에서 다운로드 사용 X, 주석처리 해두고 추후 삭제하거나 필요 시 주석 해제
+//    외부 호출 S3 다운로드 메소드
 //    public File downloadS3ToLocal(String key, String localDir) throws IOException {
 //        ResponseInputStream<GetObjectResponse> s3ObjectResponseInputStream = getS3ObjectInputStream(key);
 //        String fileName = new File(key).getName();

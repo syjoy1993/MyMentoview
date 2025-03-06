@@ -87,7 +87,7 @@ public class InterviewService {
         Interview savedInterview = createAndSaveInterview(request, resume);
 
         // 이력서 파일에서 텍스트 추출
-        String extractedText = extractResumeTextFromS3(resume.getFileUrl());
+        String extractedText = extractResumeTextFromS3(resume.getS3Key());
 
         // 면접 질문 생성 후 DTO 타입 변환
         return generateAndSaveInterviewQuestions(extractedText, savedInterview);
