@@ -2,6 +2,7 @@ package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.response.PaymentResp;
 import ce2team1.mentoview.controller.dto.response.SubscriptionResp;
+import ce2team1.mentoview.exception.ServiceException;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.service.PaymentService;
 import ce2team1.mentoview.service.PortonePaymentService;
@@ -38,13 +39,22 @@ public class SubscriptionController {
         Long userId = mvPrincipalDetails.getUserId();
 //        Long userId = 2L;
 
-        List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
-        for (SubscriptionResp subscriptionResp : subscriptions) {
-            List<PaymentResp> payments = paymentService.getPayment(subscriptionResp.getSubId());
-            subscriptionResp.setPayments(payments);
-        }
+        try {
+            List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
 
-        return ResponseEntity.ok(subscriptions);
+            for (SubscriptionResp subscriptionResp : subscriptions) {
+                try {
+                    List<PaymentResp> payments = paymentService.getPayment(subscriptionResp.getSubId());
+                    subscriptionResp.setPayments(payments);
+                } catch (Exception e) {
+                    throw new ServiceException("결제 정보를 가져오는 중 오류가 발생했습니다.");
+                }
+            }
+            return ResponseEntity.ok(subscriptions);
+
+        } catch (Exception e) {
+            throw new ServiceException("구독 정보를 가져오는 중 오류가 발생했습니다.");
+        }
     }
 
     @Operation(summary = "구독 해지", description = "결제 예약 취소 후 구독의 상태를 CANCELED로 변경합니다.")
@@ -54,7 +64,7 @@ public class SubscriptionController {
     @DeleteMapping("/subscription/{subscription_id}")
     public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
         Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 2L;
+//        Long uId = 3L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
@@ -63,8 +73,12 @@ public class SubscriptionController {
 
             // 구독의 상태 변경
             subscriptionService.deleteSubscription(sId);
+
+            return ResponseEntity.ok("구독 해지 성공");
+        } else {
+            throw new ServiceException("유효하지 않은 구독입니다.");
+
         }
-        return ResponseEntity.ok("구독 해지 성공");
 
     }
 }

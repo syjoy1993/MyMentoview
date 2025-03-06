@@ -2,6 +2,7 @@ package ce2team1.mentoview.service;
 
 import ce2team1.mentoview.controller.dto.request.PaymentCreate;
 import ce2team1.mentoview.entity.Subscription;
+import ce2team1.mentoview.exception.ServiceException;
 import ce2team1.mentoview.service.dto.BillingKeyCheckDto;
 import ce2team1.mentoview.service.dto.PaymentCheckDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -81,7 +82,7 @@ public class PortonePaymentService {
         OffsetDateTime paymentDateByWillPayAt = null;
         if (paidAt != null) {
             paymentDateByPaidAt = OffsetDateTime.parse(paidAt)
-                    .plusDays(31) // 31일 추가
+                    .plusMinutes(2) // 31일 추가
                     .withOffsetSameInstant(ZoneOffset.of("+09:00")); // KST로 설정
         } else {
             paymentDateByWillPayAt = OffsetDateTime.parse(willPayAt)
@@ -219,35 +220,19 @@ public class PortonePaymentService {
 
         String billingKey = subscriptionService.getBillingKey(sId);
 
-        String response = webClient.method(HttpMethod.DELETE) // DELETE 요청
-                .uri(baseUrl + "/payment-schedules") // URL 설정
-                .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret)) // 인증 헤더 추가
-                .bodyValue(createRequestBodyForCancelScheduling(billingKey)) // JSON Body 추가
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(error -> System.out.println("결제 취소 요청 실패: " + error.getMessage()))
-                .block();
+        try {
+            String response = webClient.method(HttpMethod.DELETE)
+                    .uri(baseUrl + "/payment-schedules")
+                    .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret))
+                    .bodyValue(createRequestBodyForCancelScheduling(billingKey))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-//        // JSON body 생성
-//        String jsonBody = createRequestBodyForCancelScheduling(billingKey);
-//
-//        // JSON을 URL 인코딩
-//        String encodedJsonBody = URLEncoder.encode(jsonBody, StandardCharsets.UTF_8);
-//
-//        String response = webClient.delete()
-//                .uri(uriBuilder -> uriBuilder
-//                        .scheme("https")  // 프로토콜 명시
-//                        .host("api.portone.io")
-//                        .path("/payment-schedules")
-//                        .queryParam("requestBody", encodedJsonBody) // JSON을 쿼리 파라미터로 전달
-//                        .build())
-//                .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret)) // 인증 헤더 추가
-//                .retrieve()
-//                .bodyToMono(String.class)
-//                .doOnError(error -> System.out.println("결제 취소 요청 실패: " + error.getMessage()))
-//                .block();
-
-        System.out.println(response);
+            System.out.println(response);
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
 
     }
 

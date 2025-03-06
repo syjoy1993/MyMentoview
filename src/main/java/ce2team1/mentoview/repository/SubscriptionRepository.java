@@ -23,4 +23,13 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     @Query("SELECT s FROM Subscription s WHERE s.status = 'CANCELED' AND s.nextBillingDate = :today")
     List<Subscription> findByStatusAndNextBillingDate(@Param("today") LocalDate today);
 
+//    List<Subscription> findAllByUser_UserId(Long userId);
+//
+//    Subscription findByUser_UserIdAndStatus(Long userId, String status);
+//
+//    Subscription findByPortonePaymentId(String paymentId);
+//
+//    List<Subscription> findByStatusAndNextBillingDate(String status, LocalDate nextBillingDate);
+
+
 }
