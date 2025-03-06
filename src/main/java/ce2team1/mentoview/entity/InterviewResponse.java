@@ -20,7 +20,8 @@ public class InterviewResponse extends AuditingFields {
     @Column(name = "response_id")
     private Long responseId;
 
-    private String respUrl;// 음성파일 저장 url
+    @Column(name = "s3_key")
+    private String s3Key;// 음성파일 저장 url
 
     @Lob
     @Column(columnDefinition = "TEXT")
@@ -32,11 +33,11 @@ public class InterviewResponse extends AuditingFields {
     @JoinColumn(name = "question_id", nullable = false, unique = true)
     private InterviewQuestion question;
 
-    public static InterviewResponse of(String respUrl, String response,Boolean answered, Duration duration,InterviewQuestion question) {
-        return new InterviewResponse (null, respUrl, response, answered, duration, question);
+    public static InterviewResponse of(String s3Key, String response,Boolean answered, Duration duration,InterviewQuestion question) {
+        return new InterviewResponse (null, s3Key, response, answered, duration, question);
     }
-    public static InterviewResponse of(Long responseId,String respUrl, String response,Boolean answered, Duration duration,InterviewQuestion question) {
-        return new InterviewResponse (responseId, respUrl, response,answered, duration,question );
+    public static InterviewResponse of(Long responseId, String s3Key, String response,Boolean answered, Duration duration,InterviewQuestion question) {
+        return new InterviewResponse (responseId, s3Key, response,answered, duration,question );
     }
 
     // 변환 텍스트 업데이트
