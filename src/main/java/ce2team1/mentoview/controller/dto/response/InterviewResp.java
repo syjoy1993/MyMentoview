@@ -3,6 +3,7 @@ package ce2team1.mentoview.controller.dto.response;
 
 import ce2team1.mentoview.entity.atrribute.InterviewStatus;
 import ce2team1.mentoview.entity.atrribute.InterviewType;
+import ce2team1.mentoview.service.dto.InterviewDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,4 +24,14 @@ public class InterviewResp {
     private InterviewType interviewType;
     private LocalDateTime created_at;
     private Long resumeId;
+
+    public static InterviewResp from(InterviewDto dto) {
+        return InterviewResp.builder()
+                .interviewId(dto.getInterviewId())
+                .interviewStatus(dto.getInterviewStatus())
+                .interviewType(dto.getInterviewType())
+                .created_at(dto.getCreatedAt())
+                .resumeId(dto.getResumeId())
+                .build();
+    }
 }
