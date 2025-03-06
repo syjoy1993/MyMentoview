@@ -31,7 +31,7 @@ public class ResponseDto {
     private static ResponseDto toDto(InterviewResponse response) {
         return ResponseDto.builder()
                 .responseId(response.getResponseId())
-                .respUrl(response.getRespUrl())
+                .respUrl(response.getS3Key())
                 .response(response.getResponse())
                 .answered(response.getAnswered())
                 .duration(response.getDuration())

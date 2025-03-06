@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice("ce2team1/mentoview/controller")
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -59,6 +59,14 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status)
                 .body(new ErrorResult(status.getReasonPhrase(), e.getMessage()));
+    }
+
+    @ExceptionHandler({InterviewException.class})
+    public ResponseEntity<ErrorResult> handleInterviewException(InterviewException e) {
+
+        ErrorResult result = new ErrorResult("InterviewException", e.getMessage());
+
+        return ResponseEntity.status(e.getStatus()).body(result);
     }
 
 

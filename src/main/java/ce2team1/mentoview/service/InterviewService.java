@@ -7,12 +7,14 @@ import ce2team1.mentoview.entity.InterviewQuestion;
 import ce2team1.mentoview.entity.Resume;
 import ce2team1.mentoview.entity.atrribute.Difficulty;
 import ce2team1.mentoview.entity.atrribute.InterviewStatus;
+import ce2team1.mentoview.exception.InterviewException;
 import ce2team1.mentoview.repository.InterviewQuestionRepository;
 import ce2team1.mentoview.repository.InterviewRepository;
 import ce2team1.mentoview.repository.ResumeRepository;
 import ce2team1.mentoview.service.dto.FAQDto;
 import ce2team1.mentoview.service.dto.QuestionDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -45,11 +47,11 @@ public class InterviewService {
 
         // 인터뷰 가져오기
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+                .orElseThrow(() -> new InterviewException("인터뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
         // 인터뷰 상태 완료 확인
         if (interview.getInterviewStatus() != InterviewStatus.COMPLETED) {
-            throw new RuntimeException("Interview is not completed");
+            throw new InterviewException("인터뷰가 완료되지 않았습니다.", HttpStatus.FORBIDDEN);
         }
 
         // 인터뷰 하위 항목 가져오기
@@ -71,7 +73,7 @@ public class InterviewService {
     // 인터뷰 상태값 반환
     public String getInterviewStatus(Long id) {
         Interview interview = interviewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+                .orElseThrow(() -> new InterviewException("인터뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
         return interview.getInterviewStatus().toString();
     }
@@ -81,7 +83,8 @@ public class InterviewService {
 
         // 이력서 조회
         Resume resume = resumeRepository.findById(request.getResumeId())
-                .orElseThrow(() -> new IllegalArgumentException("Resume not found with ID: " + request.getResumeId()));
+                .orElseThrow(() -> new InterviewException("해당 id의 이력서가 존재하지 않습니다. - ID: " + request.getResumeId(),
+                        HttpStatus.NOT_FOUND));
 
         // 인터뷰 생성
         Interview savedInterview = createAndSaveInterview(request, resume);
@@ -96,7 +99,7 @@ public class InterviewService {
     // 인터뷰 삭제
     public void deleteInterview(Long interviewId) {
         Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+                .orElseThrow(() -> new InterviewException("인터뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
 
         interviewRepository.delete(interview);
     }
@@ -117,14 +120,17 @@ public class InterviewService {
 
         // 확장자 확인
         if (!fileKey.contains(PDF_EXTENSION)) {
-            throw new IllegalArgumentException("Wrong file format: " + fileKey);
+            String[] split = fileKey.split("\\.");
+            throw new InterviewException("이력서 파일은 PDF 형식만 가능합니다. 이력서 파일을 다시 업로드해주세요.\n잘못된 파일 확장자 - " + split[split.length - 1],
+                    HttpStatus.BAD_REQUEST);
         }
 
         // pdf 에서 텍스트 추출
         try (ResponseInputStream<GetObjectResponse> s3InputStream = getFileInputStreamFromS3(fileKey)) {
             return pdfService.extractTextFromPDF(s3InputStream);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to extract text from PDF", e);
+            throw new InterviewException("이력서 텍스트 추출 중 에러가 발생했습니다. 이력서 파일을 다시 업로드해주세요.",
+                    HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
