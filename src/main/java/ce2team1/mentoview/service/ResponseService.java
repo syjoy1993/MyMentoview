@@ -4,11 +4,13 @@ package ce2team1.mentoview.service;
 import ce2team1.mentoview.controller.dto.request.ResponseUpdate;
 import ce2team1.mentoview.entity.InterviewQuestion;
 import ce2team1.mentoview.entity.InterviewResponse;
+import ce2team1.mentoview.exception.InterviewResponseException;
 import ce2team1.mentoview.repository.InterviewQuestionRepository;
 import ce2team1.mentoview.repository.InterviewResponseRepository;
 import ce2team1.mentoview.service.dto.GenerateFeedbackDto;
 import ce2team1.mentoview.service.dto.ResponseTranscribeDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +48,8 @@ public class ResponseService {
             try {
                 fileKey = s3Service.uploadS3(file, VOICE_DIR);
             } catch (IOException e) {
-                throw new RuntimeException("Failed to upload file to S3", e);
+                throw new InterviewResponseException("면접 응답 파일 업로드 중 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             InterviewResponse response = InterviewResponse.of(fileKey,
@@ -59,7 +62,7 @@ public class ResponseService {
             InterviewResponse savedResponse = responseRepository.save(response);
             ResponseTranscribeDto dto = ResponseTranscribeDto.builder()
                     .responseId(savedResponse.getResponseId())
-                    .fileUrl(savedResponse.getRespUrl())
+                    .fileUrl(savedResponse.getS3Key())
                     .build();
 
             transcribeList.add(dto);
