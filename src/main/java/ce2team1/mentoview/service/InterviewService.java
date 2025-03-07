@@ -145,10 +145,16 @@ public class InterviewService {
         // AI 질문 생성
         Map<Integer, String> questions = aiService.getInterviewQuestionFromResume(textFromPDF);
 
-        // 질문 객체 리스트 생성
+        // 질문 객체 리스트 생성 + 빈 질문 필터링
         List<InterviewQuestion> questionEntityList = questions.values().stream()
+                .filter(questionText -> questionText != null && !questionText.trim().isEmpty())  // 빈 질문 필터링
                 .map(questionText -> InterviewQuestion.of(questionText, Difficulty.EASY, interview))
                 .toList();
+
+        // 질문 5개 아닐경우 예외처리
+        if (questionEntityList.size() != 5) {
+            throw new InterviewException("질문 생성 중 오류가 발생했습니다. 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return questionRepository.saveAll(questionEntityList).stream()
                 .map(question -> QuestionDto.builder()

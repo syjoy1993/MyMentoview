@@ -5,11 +5,9 @@ import ce2team1.mentoview.controller.dto.request.ResponseUpdate;
 import ce2team1.mentoview.controller.dto.response.InterviewDetailResp;
 import ce2team1.mentoview.controller.dto.response.QuestionResp;
 import ce2team1.mentoview.exception.ErrorResult;
+import ce2team1.mentoview.exception.InterviewException;
 import ce2team1.mentoview.service.InterviewService;
 import ce2team1.mentoview.service.ResponseService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -17,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,6 +92,10 @@ public class InterviewController {
             @ApiResponse(responseCode = "422", description = "이력서에서 텍스트를 추출할 수 없습니다.",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResult.class)
+                    )),
+            @ApiResponse(responseCode = "500", description = "서버에 문제가 발생했습니다.",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResult.class)
                     ))
     })
     @PostMapping("/interview/start")
@@ -122,29 +125,25 @@ public class InterviewController {
                     ))
     })
     @PostMapping("/interview/end")
-    public ResponseEntity<?> createInterviewResponse(
-//            @RequestParam(name = "files") Map<Long, MultipartFile> files
-            @RequestPart("fileData") String fileData,
-            @RequestPart("files") List<MultipartFile> files) throws JsonProcessingException {
+    public ResponseEntity<?> createInterviewResponse(@RequestPart("files") List<MultipartFile> files) {
 
         // JSON 데이터를 Map으로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<Long, String> fileMapping = objectMapper.readValue(fileData, new TypeReference<>() {
-        });
         Map<Long, MultipartFile> fileMap = new HashMap<>();
 
-        // 파일과 매핑된 ID 출력 및 파라미터 변환
-        for (int i = 0; i < files.size(); i++) {
-            long qid = Long.parseLong(fileMapping.get((long) i + 1));
-            MultipartFile voiceFile = files.get(i);
+        // 파일과 매핑된 ID를 출력하며 처리
+        for (MultipartFile file : files) {
+            // 파일명에서 questionId 추출
+            String filename = file.getOriginalFilename();
+            if (filename != null && filename.startsWith("audio_")) {
+                long questionId = Long.parseLong(filename.substring(6, filename.lastIndexOf('.')));
 
-            System.out.println("ID: " + qid + ", File: " + voiceFile.getOriginalFilename());
-
-            fileMap.put(qid, voiceFile);
+                fileMap.put(questionId, file);
+            } else {
+                throw new InterviewException("잘못된 파일명 - " + filename, HttpStatus.BAD_REQUEST);
+            }
         }
 
         // 면접 답변 객체 생성 및 저장
-//        responseService.createResponse(files);
         responseService.createResponse(fileMap);
 
         return ResponseEntity.ok().build();

@@ -59,8 +59,9 @@ dependencies {
     //aws Transcribe
     implementation group: 'software.amazon.awssdk', name: 'transcribe', version: '2.30.26'
 
-    //pdfBox
+    //pdfBox & tesseract
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.3'
+    implementation 'net.sourceforge.tess4j:tess4j:5.15.0'
 
     //swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
