@@ -77,7 +77,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getStatus()).body(result);
     }
 
-
-
+    @ExceptionHandler(ResumeException.class)
+    public ResponseEntity<ErrorResult> handleResumeException(ResumeException e) {
+        return ResponseEntity.status(e.getStatus())
+                .body(new ErrorResult("RESUME_ERROR", e.getMessage()));
+    }
 
 }

@@ -4,12 +4,14 @@ import ce2team1.mentoview.controller.dto.response.InterviewResp;
 import ce2team1.mentoview.controller.dto.response.ResumeResp;
 import ce2team1.mentoview.entity.Resume;
 import ce2team1.mentoview.entity.User;
+import ce2team1.mentoview.exception.ResumeException;
 import ce2team1.mentoview.repository.InterviewRepository;
 import ce2team1.mentoview.repository.ResumeRepository;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.service.dto.InterviewDto;
 import ce2team1.mentoview.service.dto.ResumeDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -95,8 +97,10 @@ public class ResumeService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // Fetch and validate resume
+//        Resume resume = resumeRepository.findById(resumeId)
+//                .orElseThrow(() -> new RuntimeException("Resume not found"));
         Resume resume = resumeRepository.findById(resumeId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+                .orElseThrow(() -> new ResumeException("Resume not found", HttpStatus.NOT_FOUND));
 
         // Check ownership
         if (!resume.getUser().getUserId().equals(userId)) {
