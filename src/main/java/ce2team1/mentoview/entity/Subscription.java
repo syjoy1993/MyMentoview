@@ -50,13 +50,22 @@ public class Subscription extends AuditingFields {
     private User user;
 
     public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
-        return new Subscription(null,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
+        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
 
     }
     public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate,LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
         return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
 
     }
+
+//    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String portonePaymentId, String portoneScheduleId, User user) {
+//        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, portonePaymentId, portoneScheduleId, user);
+//
+//    }
+//    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate,LocalDate nextBillingDate, PaymentMethod paymentMethod, String portonePaymentId, String portoneScheduleId, User user) {
+//        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, portonePaymentId, portoneScheduleId, user);
+//
+//    }
 
     @Override
     public final boolean equals(Object o) {

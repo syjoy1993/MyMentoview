@@ -2,7 +2,10 @@ package ce2team1.mentoview.service;
 
 import ce2team1.mentoview.controller.dto.request.PaymentCreate;
 import ce2team1.mentoview.entity.Subscription;
+import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.exception.ServiceException;
+import ce2team1.mentoview.exception.SubscriptionException;
+import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.service.dto.BillingKeyCheckDto;
 import ce2team1.mentoview.service.dto.PaymentCheckDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,6 +35,8 @@ public class PortonePaymentService {
     private final WebClient webClient;
     private final PaymentService paymentService;
     private final SubscriptionService subscriptionService;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Value("${IMP_API_KEY}")
     private String portoneApiSecret; // PortOne API 시크릿
@@ -82,7 +88,7 @@ public class PortonePaymentService {
         OffsetDateTime paymentDateByWillPayAt = null;
         if (paidAt != null) {
             paymentDateByPaidAt = OffsetDateTime.parse(paidAt)
-                    .plusMinutes(2) // 31일 추가
+                    .plusDays(31) // 31일 추가
                     .withOffsetSameInstant(ZoneOffset.of("+09:00")); // KST로 설정
         } else {
             paymentDateByWillPayAt = OffsetDateTime.parse(willPayAt)
@@ -164,28 +170,35 @@ public class PortonePaymentService {
         }
         else {
             System.out.println(billingKeyCheckDto.getStatus());
+            userService.setBillingKey(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
         }
     }
 
-    public void createPayment(Long uId, String billingKey) throws JsonProcessingException {
+    public void createPayment(Long uId) throws JsonProcessingException {
 
         // 포트원 서버로 빌링키 결제 요청
+        User user = userRepository.findById(uId).orElseThrow();
+        String billingKey = user.getBillingKey();
 
         // paymentId 생성
         String paymentId = "payment-" + UUID.randomUUID().toString();
         String encodedPaymentId = URLEncoder.encode(paymentId, StandardCharsets.UTF_8);
 
-        String response = webClient.post()
-                .uri(baseUrl + "/payments/{paymentId}/billing-key", encodedPaymentId)
-                .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(createRequestBodyForCreatingPayment(uId, billingKey))
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(error -> System.out.println("빌링키 결제 요청 실패: " + error.getMessage()))
-                .block();
+        try {
+            String response = webClient.post()
+                    .uri(baseUrl + "/payments/{paymentId}/billing-key", encodedPaymentId)
+                    .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .bodyValue(createRequestBodyForCreatingPayment(uId, billingKey))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        System.out.println(response);
+            System.out.println(response);
+        } catch (Exception e) {
+            throw new SubscriptionException(e.getMessage() + "결제 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
@@ -231,7 +244,7 @@ public class PortonePaymentService {
 
             System.out.println(response);
         } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
+            throw new SubscriptionException(e.getMessage() + " 구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -262,8 +275,9 @@ public class PortonePaymentService {
         // 새로운 빌링키로 다시 결제 예약
         schedulePayment(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey(), null, timeToPay);
 
-        // 구독의 빌링키 변경
+        // 빌링키 변경
         subscriptionService.modifyBillingKey(subscription.getSubId(), billingKeyCheckDto.getBillingKey());
+        userService.setBillingKey(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
 
     }
 
