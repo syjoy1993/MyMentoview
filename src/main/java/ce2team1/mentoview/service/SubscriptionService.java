@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,7 +31,7 @@ public class SubscriptionService {
 
     public List<SubscriptionResp> getSubscriptions(Long uId) {
 
-        return subscriptionRepository.findAllByUserId(uId)
+        return subscriptionRepository.findAllByUser_UserId(uId)
                                     .stream()
                                     .map(subscription -> {
                                         SubscriptionResp resp = SubscriptionResp.toResp(SubscriptionDto.toDto(subscription));
@@ -53,17 +54,18 @@ public class SubscriptionService {
 
         // 삭제 시 디비에서 삭제하는 게 아니라 status를 변경
         Subscription subscription = subscriptionRepository.findByPortonePaymentId(paymentId);
-        subscription.modifyStatusToExpiry();
+        if (subscription != null) {
+            subscription.modifyStatusToExpiry();
+        }
     }
 
     public Subscription createSubscription(PaymentCheckDto paymentCheckDto) {
 
         // paidAt 포맷팅
         String paidAtString = paymentCheckDto.getPaidAt();
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME);
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME).withZoneSameInstant(ZoneId.of("Asia/Seoul"));;
         LocalDate ld = zonedDateTime.toLocalDate();
 
-        System.out.println("이제 유저 찾을 거");
         User user = userRepository.findById(Long.valueOf(paymentCheckDto.getCustomer().getId())).orElseThrow();
         System.out.println(user.getUserId());
 
@@ -75,7 +77,6 @@ public class SubscriptionService {
                                                                     ld.plusDays(30),
                                                                     ld.plusDays(31),
                                                                     paymentMethod,
-                                                                    paymentCheckDto.getBillingKey(),
                                                                     null,
                                                                     null,
                                                                     user)
@@ -84,7 +85,7 @@ public class SubscriptionService {
 
     public Long checkSubscription(Long uId) {
 
-        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+        Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
         System.out.println(subscription);
 
         if (subscription != null) {
@@ -102,32 +103,33 @@ public class SubscriptionService {
         return subscription;
     }
 
-    public String getBillingKey(Long sId) {
-        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
-        return subscription.getBillingKey();
-    }
+//    public String getBillingKey(Long sId) {
+//        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+//        return subscription.getBillingKey();
+//    }
+
 
     @Transactional
     public void initPaymentScheduleIdAndPaymentId(Long uId, String paymentId, String scheduleId) {
-        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+        Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
         subscription.setPaymentIdAndScheduleId(paymentId, scheduleId);
     }
 
     public Subscription getSubscriptionByUserId(Long uId) {
-        Subscription subscription = subscriptionRepository.findActiveSubscriptionByUserId(uId);
+        Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
 
         return subscription;
     }
 
-    @Transactional
-    public void modifyBillingKey(Long sId, String billingKey) {
-
-        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
-        subscription.modifyBillingKey(billingKey);
-    }
+//    @Transactional
+//    public void modifyBillingKey(Long sId, String billingKey) {
+//
+//        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+//        subscription.modifyBillingKey(billingKey);
+//    }
 
     public List<Subscription> findCanceledSubscriptionsOfToday(LocalDate today) {
 
-        return subscriptionRepository.findByStatusAndNextBillingDate(today);
+        return subscriptionRepository.findByStatusAndNextBillingDate(SubscriptionStatus.CANCELED, today);
     }
 }
