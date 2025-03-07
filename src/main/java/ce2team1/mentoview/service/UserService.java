@@ -8,6 +8,7 @@ import ce2team1.mentoview.repository.SubscriptionRepository;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.security.dto.OAuth2ResponseSocial;
 import ce2team1.mentoview.service.dto.UserDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final PasswordEncoder passwordEncoder;
+
 
     public UserDto createUser(UserDto userDto) {
 
@@ -89,5 +91,18 @@ public class UserService {
                 .providerId(responseSocial.getProviderId())
                 .status(UserStatus.ACTIVE)
                 .build();
+    }
+
+    @Transactional
+    public void setBillingKey(Long uId, String billingKey) {
+        User user = userRepository.findById(uId).orElseThrow();
+
+        user.setBillingKey(billingKey);
+
+    }
+
+    public String getBillingKey(Long uId) {
+        User user = userRepository.findById(uId).orElseThrow();
+        return user.getBillingKey();
     }
 }

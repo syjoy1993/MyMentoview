@@ -44,7 +44,7 @@ public class PaymentService {
 
     public List<PaymentResp> getPayment(Long subId) {
 
-        return paymentRepository.findAllBySubId(subId)
+        return paymentRepository.findBySubscription_SubId(subId)
                 .stream()
                 .map(payment -> {
                     PaymentResp resp = PaymentResp.toResp(PaymentDto.toDto(payment));

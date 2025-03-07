@@ -39,7 +39,7 @@ public class Subscription extends AuditingFields {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    private String billingKey; // 구독 결제에 사용된 빌링키
+//    private String billingKey; // 구독 결제에 사용된 빌링키
 
     private String portonePaymentId; // 다음 결제 예약 건의 거래 id : 결제 실패 시 필요
 
@@ -49,12 +49,21 @@ public class Subscription extends AuditingFields {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
-        return new Subscription(null,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
+//    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
+//        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
+//
+//    }
+//    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate,LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
+//        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
+//
+//    }
+
+    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String portonePaymentId, String portoneScheduleId, User user) {
+        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, portonePaymentId, portoneScheduleId, user);
 
     }
-    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate,LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
-        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portonePaymentId, portoneScheduleId, user);
+    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate,LocalDate nextBillingDate, PaymentMethod paymentMethod, String portonePaymentId, String portoneScheduleId, User user) {
+        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, portonePaymentId, portoneScheduleId, user);
 
     }
 
@@ -96,8 +105,8 @@ public class Subscription extends AuditingFields {
         this.portoneScheduleId = portoneScheduleId;
     }
 
-    public void modifyBillingKey(String billingKey) {
-        this.billingKey = billingKey;
-    }
+//    public void modifyBillingKey(String billingKey) {
+//        this.billingKey = billingKey;
+//    }
 
 }

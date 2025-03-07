@@ -97,4 +97,8 @@ public class User extends AuditingFields {
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
+
+    public void setBillingKey(String billingKey) {
+        this.billingKey = billingKey;
+    }
 }

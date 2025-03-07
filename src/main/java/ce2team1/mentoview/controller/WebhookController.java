@@ -2,9 +2,7 @@ package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.request.BillingKeyCreate;
 import ce2team1.mentoview.controller.dto.request.PaymentCreate;
-import ce2team1.mentoview.service.PortonePaymentService;
-import ce2team1.mentoview.service.SubscriptionService;
-import ce2team1.mentoview.service.WebhookService;
+import ce2team1.mentoview.service.*;
 import ce2team1.mentoview.service.dto.BillingKeyCheckDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,6 +59,7 @@ public class WebhookController {
                 System.err.println("결제 조회 실패: " + e.getMessage());
             }
         } else if ("Transaction.Failed".equals(payload.getType())) {
+            // 어떠한 이유(카드의 잔액 부족 등)로 결제 실패
             // 구독 조회해서 구독의 status 변경
             subscriptionService.deleteSubscriptionByPaymentId(payload.getData().getPaymentId());
         }
@@ -90,11 +89,11 @@ public class WebhookController {
 
         // 유저 객체에 빌링키값 저장
         if ("BillingKey.Issued".equals(payload.getType())) {
-            // 빌링키 조회
-            BillingKeyCheckDto billingKeyCheckDto = portonePaymentService.checkBillingKey(payload.getData().getBillingKey());
+            // 빌링키 조회 후 user에 저장
+            portonePaymentService.checkBillingKey(payload.getData().getBillingKey());
 
-            // BillingKey를 통해 결제 요청
-            portonePaymentService.createPayment(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
+//            // BillingKey를 통해 결제 요청
+//            portonePaymentService.createPayment(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
 
         }
 
