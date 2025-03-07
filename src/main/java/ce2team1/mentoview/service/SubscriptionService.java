@@ -77,7 +77,6 @@ public class SubscriptionService {
                                                                     ld.plusDays(30),
                                                                     ld.plusDays(31),
                                                                     paymentMethod,
-                                                                    paymentCheckDto.getBillingKey(),
                                                                     null,
                                                                     null,
                                                                     user)
@@ -104,10 +103,10 @@ public class SubscriptionService {
         return subscription;
     }
 
-    public String getBillingKey(Long sId) {
-        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
-        return subscription.getBillingKey();
-    }
+//    public String getBillingKey(Long sId) {
+//        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+//        return subscription.getBillingKey();
+//    }
 
 
     @Transactional
@@ -122,12 +121,12 @@ public class SubscriptionService {
         return subscription;
     }
 
-    @Transactional
-    public void modifyBillingKey(Long sId, String billingKey) {
-
-        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
-        subscription.modifyBillingKey(billingKey);
-    }
+//    @Transactional
+//    public void modifyBillingKey(Long sId, String billingKey) {
+//
+//        Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
+//        subscription.modifyBillingKey(billingKey);
+//    }
 
     public List<Subscription> findCanceledSubscriptionsOfToday(LocalDate today) {
 

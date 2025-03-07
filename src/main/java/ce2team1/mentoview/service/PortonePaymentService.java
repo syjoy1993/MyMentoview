@@ -229,9 +229,9 @@ public class PortonePaymentService {
         return response;
     }
 
-    public void cancelScheduling(Long sId) throws JsonProcessingException {
+    public void cancelScheduling(Long uId) throws JsonProcessingException {
 
-        String billingKey = subscriptionService.getBillingKey(sId);
+        String billingKey = userService.getBillingKey(uId);
 
         try {
             String response = webClient.method(HttpMethod.DELETE)
@@ -270,13 +270,13 @@ public class PortonePaymentService {
         String timeToPay = getScheduling(subscription.getPortoneScheduleId());
 
         // 빌링키로 기존 결제 예약 취소
-        cancelScheduling(subscription.getSubId());
+        cancelScheduling(Long.valueOf(billingKeyCheckDto.getCustomer().getId()));
 
         // 새로운 빌링키로 다시 결제 예약
         schedulePayment(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey(), null, timeToPay);
 
         // 빌링키 변경
-        subscriptionService.modifyBillingKey(subscription.getSubId(), billingKeyCheckDto.getBillingKey());
+//        subscriptionService.modifyBillingKey(subscription.getSubId(), billingKeyCheckDto.getBillingKey());
         userService.setBillingKey(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
 
     }

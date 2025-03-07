@@ -100,4 +100,9 @@ public class UserService {
         user.setBillingKey(billingKey);
 
     }
+
+    public String getBillingKey(Long uId) {
+        User user = userRepository.findById(uId).orElseThrow();
+        return user.getBillingKey();
+    }
 }

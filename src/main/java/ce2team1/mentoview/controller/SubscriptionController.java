@@ -72,13 +72,14 @@ public class SubscriptionController {
     })
     @DeleteMapping("/subscription/{subscription_id}")
     public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
+
         Long uId = mvPrincipalDetails.getUserId();
 //        Long uId = 1L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
             // 결제 예약 취소
-            portonePaymentService.cancelScheduling(sId);
+            portonePaymentService.cancelScheduling(uId);
 
             // 구독의 상태 변경
             subscriptionService.deleteSubscription(sId);
