@@ -31,9 +31,7 @@ public class ResumeService {
     // userId 값별로 resume list 출력
     // resumeId 값 별로 interview list 출력
     public List<ResumeResp> getResumesByUserId(Long userId) {
-//        return resumeRepository.findByUserUserId(userId).stream()
-//                .map(ResumeDto::from)
-//                .collect(Collectors.toList());
+
         // Validate user existence
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -96,9 +94,6 @@ public class ResumeService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Fetch and validate resume
-//        Resume resume = resumeRepository.findById(resumeId)
-//                .orElseThrow(() -> new RuntimeException("Resume not found"));
         Resume resume = resumeRepository.findById(resumeId)
                 .orElseThrow(() -> new ResumeException("Resume not found", HttpStatus.NOT_FOUND));
 
