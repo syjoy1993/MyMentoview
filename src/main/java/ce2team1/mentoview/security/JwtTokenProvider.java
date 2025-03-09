@@ -21,19 +21,30 @@ public class JwtTokenProvider {
     private SecretKey secretKey;
     private long accessTokenExpiration;
     private long refreshTokenExpiration;
+    private long temporaryTokenExpiration;
+
+    private static final String TEMPORARY = "temporary";
     private static final String ACCESS = "access";
     private static final String REFRESH = "refresh";
 
     //JwtTokenProvider 생성자
     public JwtTokenProvider(
-            @Value("${spring.jwt.secret}") String secret,
+            @Value
+                    ("${spring.jwt.secret}") String secret,
             @Value("${access-token-expiration}") long accessTokenExpiration,
-            @Value("${refresh-token-expiration}") long refreshTokenExpiration)
-     {
-        this.secretKey  = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
+            @Value("${refresh-token-expiration}") long refreshTokenExpiration,
+            @Value("${temporary-token-expiration}") long temporaryTokenExpiration
+    ){
+
+        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
+        this.temporaryTokenExpiration = temporaryTokenExpiration;
+    }
+    //TemporaryToken
+    public String createTemporaryToken(String email, Role role) {
+        return createToken(TEMPORARY, email, role, temporaryTokenExpiration);
     }
 
     //AccessToken
@@ -44,6 +55,7 @@ public class JwtTokenProvider {
     public String createRefreshToken(String email, Role role) {
         return createToken(REFRESH ,email, role, refreshTokenExpiration);
     }
+
 
     // 토큰 검증 메서드 : 토큰을 인자로 받음 ,java꺼
     public boolean validateToken(String token) { // 서명 검증
@@ -56,7 +68,7 @@ public class JwtTokenProvider {
     }
 
     public String getEmailFromToken(String token) { // 이멜검증
-        if (validateToken(token)) {
+        if (!validateToken(token)) {
             throw new SecurityException("Invalid JWT Token");
         }
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
@@ -64,27 +76,26 @@ public class JwtTokenProvider {
     }
 
     public Role getRoleFromToken(String token) { //role검증
-        if (validateToken(token)) {
+        if (!validateToken(token)) {
             throw new SecurityException("Invalid JWT Token");
         }
         String role = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
                 .get("role").toString();
-
         return Role.valueOf(role);
     }
 
 
     public Boolean isExpired(String token) { // 만료
         try {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-                .getExpiration().before(new Date());
+            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                    .getExpiration().before(new Date());
         } catch (Exception e) {
             return true;
         }
     }
 
     public String getType(String token) { //타입검
-        if (validateToken(token)) {
+        if (!validateToken(token)) {
             throw new SecurityException("Invalid JWT Token");
         }
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
