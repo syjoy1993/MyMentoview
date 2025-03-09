@@ -1,6 +1,7 @@
 package ce2team1.mentoview.service;
 
 import ce2team1.mentoview.entity.Subscription;
+import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +26,7 @@ public class SubscriptionSchedulingService {
         List<Subscription> expiredSubscriptions = subscriptionService.findCanceledSubscriptionsOfToday(today);
 
         for (Subscription subscription : expiredSubscriptions) {
-            subscription.modifyStatusToExpiry();
+            subscription.modifyStatus(SubscriptionStatus.EXPIRY);
         }
 
         System.out.println("만료된 구독 상태 업데이트 완료!");

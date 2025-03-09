@@ -46,7 +46,7 @@ public class SubscriptionService {
 
         // 삭제 시 디비에서 삭제하는 게 아니라 status를 변경
         Subscription subscription = subscriptionRepository.findById(sId).orElseThrow();
-        subscription.modifyStatusToCanceled();
+        subscription.modifyStatus(SubscriptionStatus.CANCELED);
     }
 
     @Transactional
@@ -55,11 +55,11 @@ public class SubscriptionService {
         // 삭제 시 디비에서 삭제하는 게 아니라 status를 변경
         Subscription subscription = subscriptionRepository.findByPortonePaymentId(paymentId);
         if (subscription != null) {
-            subscription.modifyStatusToExpiry();
+            subscription.modifyStatus(SubscriptionStatus.EXPIRY);
         }
     }
 
-    public Subscription createSubscription(PaymentCheckDto paymentCheckDto) {
+    public SubscriptionDto createSubscription(PaymentCheckDto paymentCheckDto) {
 
         // paidAt 포맷팅
         String paidAtString = paymentCheckDto.getPaidAt();
@@ -70,7 +70,7 @@ public class SubscriptionService {
         System.out.println(user.getUserId());
 
         PaymentMethod paymentMethod = "KAKAOPAY".equals(paymentCheckDto.getMethod().getProvider())? PaymentMethod.KAKAO_PAY : PaymentMethod.CREDIT_CARD;
-        return subscriptionRepository.save(Subscription.of(
+        return SubscriptionDto.toDto(subscriptionRepository.save(Subscription.of(
                                                                     SubscriptionStatus.ACTIVE,
                                                                     SubscriptionPlan.PREMIUM,
                                                                     ld,
@@ -80,7 +80,7 @@ public class SubscriptionService {
                                                                     null,
                                                                     null,
                                                                     user)
-                                                                );
+                                                                ));
     }
 
     public Long checkSubscription(Long uId) {
@@ -95,12 +95,12 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public Subscription modifyEndDateAndNextBillingDate(Long subId, String paidAt) {
+    public SubscriptionDto modifyEndDateAndNextBillingDate(Long subId, String paidAt) {
 
         Subscription subscription = subscriptionRepository.findById(subId).orElseThrow();
         subscription.modifyEndDateAndNextBillingDate(paidAt);
 
-        return subscription;
+        return SubscriptionDto.toDto(subscription);
     }
 
 //    public String getBillingKey(Long sId) {
@@ -112,11 +112,15 @@ public class SubscriptionService {
     @Transactional
     public void initPaymentScheduleIdAndPaymentId(Long uId, String paymentId, String scheduleId) {
         Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
+
+        if (subscription == null) {
+            subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.CANCELED);
+        }
         subscription.setPaymentIdAndScheduleId(paymentId, scheduleId);
     }
 
-    public Subscription getSubscriptionByUserId(Long uId) {
-        Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
+    public Subscription getSubscriptionByUserId(Long uId, SubscriptionStatus status) {
+        Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, status);
 
         return subscription;
     }
@@ -131,5 +135,11 @@ public class SubscriptionService {
     public List<Subscription> findCanceledSubscriptionsOfToday(LocalDate today) {
 
         return subscriptionRepository.findByStatusAndNextBillingDate(SubscriptionStatus.CANCELED, today);
+    }
+
+    @Transactional
+    public void modifySubscriptionStatusToActive(Long uId, SubscriptionStatus subscriptionStatus) {
+        Subscription subscription = getSubscriptionByUserId(uId, subscriptionStatus);
+        subscription.modifyStatus(SubscriptionStatus.ACTIVE);
     }
 }

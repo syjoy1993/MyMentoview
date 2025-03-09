@@ -5,6 +5,7 @@ import ce2team1.mentoview.entity.atrribute.AuditingFields;
 import ce2team1.mentoview.entity.atrribute.PaymentMethod;
 import ce2team1.mentoview.entity.atrribute.SubscriptionPlan;
 import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
+import ce2team1.mentoview.service.dto.SubscriptionDto;
 import ce2team1.mentoview.utils.jpaconverter.SubscriptionStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -83,12 +84,8 @@ public class Subscription extends AuditingFields {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
-    public void modifyStatusToCanceled() {
-        this.status = SubscriptionStatus.CANCELED;
-    }
-
-    public void modifyStatusToExpiry() {
-        this.status = SubscriptionStatus.EXPIRY;
+    public void modifyStatus(SubscriptionStatus subscriptionStatus) {
+        this.status = subscriptionStatus;
     }
 
     public void modifyEndDateAndNextBillingDate(String paidAt) {
@@ -104,6 +101,7 @@ public class Subscription extends AuditingFields {
         this.portonePaymentId = portonePaymentId;
         this.portoneScheduleId = portoneScheduleId;
     }
+
 
 //    public void modifyBillingKey(String billingKey) {
 //        this.billingKey = billingKey;
