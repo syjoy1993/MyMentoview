@@ -13,7 +13,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -36,12 +36,11 @@ public class User extends AuditingFields {
     @Convert(converter = UserRoleConverter.class)
     private Role role;
 
-    @Column(nullable = true)
+    @Column(nullable = true) @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;// OAuth
 
     @Column(nullable = true)
     private String providerId;// OAuth의 providerId
-
 
     @Enumerated(EnumType.STRING)
     private UserStatus status;
@@ -75,9 +74,17 @@ public class User extends AuditingFields {
                 .build();
 
     }
+/*
     // OAuth2용
     public void updateSocialInfo(String newProviderId) {
         this.providerId = newProviderId;
+    }
+*/
+
+    public User updateBillingKey(String billingKey) {
+        return this.toBuilder()
+                .billingKey(billingKey)
+                .build();
     }
 
 
@@ -98,7 +105,4 @@ public class User extends AuditingFields {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
-    public void setBillingKey(String billingKey) {
-        this.billingKey = billingKey;
-    }
 }
