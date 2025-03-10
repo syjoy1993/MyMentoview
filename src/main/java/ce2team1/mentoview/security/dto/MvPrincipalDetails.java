@@ -2,21 +2,45 @@ package ce2team1.mentoview.security.dto;
 
 import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.service.dto.UserDto;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 //Provider가 받아서 로그인 한다
-@RequiredArgsConstructor
+@Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     private final UserDto userDto;
-    //private final Map<String, Object> attributes;
+    private final Map<String, Object> attributes;
+    private final OidcUser oidcUser; // OidcUser
+
+    public static MvPrincipalDetails of(UserDto userDto) { //폼
+        return new MvPrincipalDetails(userDto, Collections.emptyMap(), null);
+    }
+    public static MvPrincipalDetails of(UserDto userDto, Map<String, Object> attributes) {//OAuth2User전용
+        return new MvPrincipalDetails(userDto, attributes, null);
+
+    }
+    public static MvPrincipalDetails of(UserDto userDto, OidcUser oidcUser) { // OIDC 구현체 전용
+        return new MvPrincipalDetails(userDto, oidcUser.getAttributes(), oidcUser);
+    }
+
+    public UserDto getUserDto() {
+        return userDto;
+    }
 
     //검증 이메일로함
     @Override
@@ -24,13 +48,13 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
         return userDto.getEmail();
     }
 
-    @Override
-    public String getPassword() {
-        return userDto.getPassword() != null ? userDto.getPassword() : "";
+    public String getUsername() {
+        return userDto.getEmail();
     }
 
-    public String getUsername() {
-        return userDto.getName();
+    @Override
+    public String getPassword() {
+        return userDto.getPassword();
     }
 
     public Long getUserId() { // Long id
@@ -45,6 +69,11 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
                 .build();
     }
 
+    public String getRealName() {
+        return userDto.getName();
+    }
+
+
     @Override
     public boolean isEnabled() {
         return userDto.getStatus() == UserStatus.ACTIVE;
@@ -52,18 +81,11 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collection = new ArrayList<>();
-        collection.add(new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return userDto.getRole().getCode();
-            }
-        });
-        return collection;
+        return List.of(new SimpleGrantedAuthority(userDto.getRole().getCode()));
     }
-
     @Override
     public Map<String, Object> getAttributes() { // 받은 데이터값
-        return Map.of(); //Map.of();
+        return this.attributes;
     }
+
 }

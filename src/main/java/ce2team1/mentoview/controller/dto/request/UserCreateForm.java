@@ -1,8 +1,6 @@
 package ce2team1.mentoview.controller.dto.request;
 
 
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,9 +23,8 @@ public class UserCreateForm {
     @NotBlank
     private String name;
 
-    @JsonIgnore
+    @Builder.Default
     private boolean isSocial = false;
-    private UserStatus status = UserStatus.ACTIVE;
 
 
 

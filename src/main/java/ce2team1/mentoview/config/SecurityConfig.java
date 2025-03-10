@@ -1,71 +1,165 @@
 package ce2team1.mentoview.config;
 
 import ce2team1.mentoview.security.*;
+import ce2team1.mentoview.security.service.MvAuthenticationProvider;
+import ce2team1.mentoview.security.service.MvOAuth2UserService;
+import ce2team1.mentoview.security.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+@Slf4j
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
+    private final MvAuthenticationProvider mvAuthenticationProvider;
     private final MvOAuth2UserService mvOAuth2UserService;
-    private final MvOAuth2AuthenticationFailureHandler mvOAuth2AuthenticationFailureHandler;
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final MvSuccessHandler mvSuccessHandler;
+    private final MvRequestFilter mvRequestFilter;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        log.info("✅ [SecurityConfig] clientRegistrationRepository 생성 완료");
+        return new MvHttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository(MvOAuth2ClientRegistration mvOAuth2ClientRegistration) {
+        return new InMemoryClientRegistrationRepository(mvOAuth2ClientRegistration.googleClientRegistration());
+    }
+
+
+    private void configureCommon(HttpSecurity security) throws Exception {
         security.cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
-                //.oauth2Login((Customizer.withDefaults()))//oauth2 해제X
-                .formLogin(formLogin -> formLogin.loginPage("/login")
-                        .usernameParameter("email")
-                        .passwordParameter("password"))
+                .formLogin(formLogin -> formLogin.disable())
 
                 .headers(headers -> headers
-                        .httpStrictTransportSecurity(hsts -> hsts.disable()));//AWS
-        //OAuth2
-        security.oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-                        .userService(mvOAuth2UserService))
-                .successHandler(mvSuccessHandler)
-                .failureHandler(mvOAuth2AuthenticationFailureHandler));
+                        .addHeaderWriter(new StaticHeadersWriter("Cross-Origin-Opener-Policy", "same-origin-allow-popups")) // ✅ 직접 헤더 추가
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                        .httpStrictTransportSecurity(hsts -> hsts.disable()))//AWS
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        security.addFilterAfter(new MvRequestFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-        // 인가
-        security.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests
-                        .requestMatchers("/api/test").permitAll()
-                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**", "/swagger-resources/**").permitAll() //swagger
-                        .requestMatchers("/", "/favicon.ico", "/static","/about","/contactus").permitAll()
-                        .requestMatchers("/api/signup/**", "/api/login/**","/api/auth/google","/token/**").permitAll()
-                        .requestMatchers("/error", "/error/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+    }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+
+        return web -> web.ignoring().requestMatchers("/img/**")
+                .requestMatchers("/api/test")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**") //swagger
+                .requestMatchers("/", "/favicon.ico", "/static", "/about", "/contactus")
+                .requestMatchers("/error", "/error/**");
+
+    }
+
+
+    /*     .authorizeHttpRequests(request -> request
+                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                     .anyRequest().hasAnyRole(PERMITTED_ROLES)
+             )*/
+    @Bean
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity security,
+                                                         AuthenticationManager authenticationManager) throws Exception {
+        configureCommon(security);
+        security.securityMatcher("/oauth2/authorization/google", "/login/oauth2/code/**")// 이 URL만 처리함
+                .anonymous(anonymous ->
+                        anonymous.principal("anonymousUser").authorities("ROLE_ANONYMOUS"))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/google", "/api/authorization/google/**", "/oauth2/authorization/google").permitAll()
+                        .requestMatchers("/login/oauth2/code/google").permitAll()
+                        .requestMatchers("/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
-        );
-        //세션 비활
-        security.sessionManagement(sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authEndpoint -> authEndpoint
+                                .authorizationRequestRepository(authorizationRequestRepository()))
+                        // .baseUri("/oauth2/authorization/google"))
+                        .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig
+                                .baseUri("/login/oauth2/code/google"))
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(mvOAuth2UserService))
+                        .successHandler(mvOAuth2FormSuccessHandler())
+                        .failureHandler(mvOAuth2FormFailureHandler())
+                );
+        return security.build();
+    }
+
+    @Bean
+    public SecurityFilterChain formLoginSecurityFilterChain(HttpSecurity security,
+                                                            AuthenticationManager authenticationManager,
+                                                            MvLoginFormFilter mvLoginFormFilter, AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        configureCommon(security);
+        security.securityMatcher("/api/login") // 폼 로그인 요청만 매칭
+                .anonymous(anonymous -> anonymous.
+                        principal("anonymousUser")
+                        .authorities("ROLE_ANONYMOUS"))
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .addFilterBefore(mvLoginFormFilter, UsernamePasswordAuthenticationFilter.class);
+        security.addFilterAfter(mvRequestFilter, SecurityContextHolderFilter.class);
 
         return security.build();
 
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public SecurityFilterChain commonSecurityFilterChain(HttpSecurity security) throws Exception {
+        configureCommon(security);
+        security.authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                        .requestMatchers("/api/signup/**").permitAll()
+                        .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated());
+        security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        return security.build();
     }
 
+
+    @Bean
+    public AuthenticationSuccessHandler mvOAuth2FormSuccessHandler() {
+        return new MvOAuth2FormSuccessHandler(jwtTokenProvider, refreshTokenService);
+    }
+
+    @Bean
+    public AuthenticationFailureHandler mvOAuth2FormFailureHandler() {
+        return new MvOAuth2FormFailureHandler();
+    }
+
+    @Bean
+    public MvLoginFormFilter mvLoginFormFilter(AuthenticationManager authenticationManager) {
+        MvLoginFormFilter filter = new MvLoginFormFilter(authenticationManager, mvOAuth2FormSuccessHandler(), mvOAuth2FormFailureHandler());
+        filter.setFilterProcessesUrl("/api/login");
+        return filter;
+    }
 }
+
+
+
+

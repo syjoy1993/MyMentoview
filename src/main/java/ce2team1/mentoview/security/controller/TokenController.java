@@ -1,6 +1,8 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.controller;
 
 import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.security.JwtTokenProvider;
+import ce2team1.mentoview.security.service.RefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/token")
+@RequestMapping("api/token")
 @RequiredArgsConstructor
 public class TokenController {
     private final JwtTokenProvider jwtTokenProvider;
@@ -50,7 +52,7 @@ public class TokenController {
 
         String type = jwtTokenProvider.getType(authHeader);
         if (!type.equals("access")) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("invalid token", HttpStatus.FORBIDDEN);
         }
 
         Role roleFromToken = jwtTokenProvider.getRoleFromToken(refreshToken);

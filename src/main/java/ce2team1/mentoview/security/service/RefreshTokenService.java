@@ -1,4 +1,4 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.service;
 
 import ce2team1.mentoview.repository.RefreshTokenRepository;
 import ce2team1.mentoview.security.dto.RefreshTokenDto;
