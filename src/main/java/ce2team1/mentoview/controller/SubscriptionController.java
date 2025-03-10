@@ -2,6 +2,7 @@ package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.response.PaymentResp;
 import ce2team1.mentoview.controller.dto.response.SubscriptionResp;
+import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
 import ce2team1.mentoview.exception.SubscriptionException;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.service.PaymentService;
@@ -59,7 +60,7 @@ public class SubscriptionController {
         Long userId = mvPrincipalDetails.getUserId();
 //        Long userId = 1L;
 
-        if (subscriptionService.getSubscriptionByUserId(userId) != null) {
+        if (subscriptionService.getSubscriptionByUserId(userId, SubscriptionStatus.ACTIVE) != null) {
             return ResponseEntity.ok("구독 처리 완료");
         } else {
             return ResponseEntity.ok(null);
@@ -95,7 +96,7 @@ public class SubscriptionController {
     @Operation(summary = "결제 생성", description = "포트원 서버로 결제를 요청합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "결제 요청이 성공적으로 처리됐습니다."),
-            @ApiResponse(responseCode = "500", description = "결제 요청 중 문제가 발생했습니다.")
+            @ApiResponse(responseCode = "500", description = "결제 요청 처리 중 문제가 발생했습니다.")
     })
     @PostMapping("/subscription")
     public ResponseEntity<String> createSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
@@ -103,13 +104,13 @@ public class SubscriptionController {
         Long uId = mvPrincipalDetails.getUserId();
 //        Long uId = 1L;
 
-        try {
+        if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) == null) {
             portonePaymentService.createPayment(uId);
-            return ResponseEntity.ok("결제가 정상적으로 처리되었습니다.");
-        } catch (SubscriptionException e) {
-            return ResponseEntity.status(e.getStatus()).body(e.getMessage()); // 예외에서 설정한 상태 코드와 메시지 반환
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다. 다시 시도해주세요.");
+        } else {
+            // 현재 CANCELED 상태의 구독의 nextBillingDate로 결제를 예약하고, 구독의 상태 ACTIVE로 변경
+            portonePaymentService.processSubscriptionReactivation(uId);
         }
+        return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
+
     }
 }

@@ -3,6 +3,7 @@ package ce2team1.mentoview.service;
 import ce2team1.mentoview.controller.dto.request.PaymentCreate;
 import ce2team1.mentoview.entity.Subscription;
 import ce2team1.mentoview.entity.User;
+import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
 import ce2team1.mentoview.exception.ServiceException;
 import ce2team1.mentoview.exception.SubscriptionException;
 import ce2team1.mentoview.repository.UserRepository;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -98,19 +100,23 @@ public class PortonePaymentService {
         OffsetDateTime paymentDate = willPayAt == null ? paymentDateByPaidAt : paymentDateByWillPayAt;
         System.out.println(paymentDate);
 
-        String response = webClient.post()
-                .uri(baseUrl + "/payments/{paymentId}/schedule", encodedPaymentId)
-                .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(createRequestBodyForSchedulingPayment(uId, billingKey, paymentDate))
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(error -> System.out.println("결제 예약 요청 실패: " + error.getMessage()))
-                .block();
+        try {
+            String response = webClient.post()
+                    .uri(baseUrl + "/payments/{paymentId}/schedule", encodedPaymentId)
+                    .header(HttpHeaders.AUTHORIZATION, "PortOne " + portoneApiSecret)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .bodyValue(createRequestBodyForSchedulingPayment(uId, billingKey, paymentDate))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        System.out.println(response);
-        String scheduleId = response.split("\"schedule\":\\{\"id\":\"")[1].split("\"")[0];
-        subscriptionService.initPaymentScheduleIdAndPaymentId(uId, paymentId, scheduleId);
+            System.out.println(response);
+            String scheduleId = response.split("\"schedule\":\\{\"id\":\"")[1].split("\"")[0];
+            subscriptionService.initPaymentScheduleIdAndPaymentId(uId, paymentId, scheduleId);
+
+        } catch (Exception e) {
+            throw new SubscriptionException(e.getMessage() + "결제 처리 중 문제가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private String createRequestBodyForSchedulingPayment(Long uId, String billingKey, OffsetDateTime dateTime) throws JsonProcessingException {
@@ -264,7 +270,7 @@ public class PortonePaymentService {
     public void processChangingBillingKey(BillingKeyCheckDto billingKeyCheckDto) throws JsonProcessingException {
 
         // 구독 조회
-        Subscription subscription = subscriptionService.getSubscriptionByUserId(Long.valueOf(billingKeyCheckDto.getCustomer().getId()));
+        Subscription subscription = subscriptionService.getSubscriptionByUserId(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), SubscriptionStatus.ACTIVE);
 
         // 구독의 portoneScheduleId값을 통해 결제 예약 조회해서 이전 예약 시간 가져옴
         String timeToPay = getScheduling(subscription.getPortoneScheduleId());
@@ -299,6 +305,17 @@ public class PortonePaymentService {
 
         String timeToPay = rootNode.get("timeToPay").asText();
         return timeToPay;
+
+    }
+
+    public void processSubscriptionReactivation(Long uId) throws JsonProcessingException {
+
+        Subscription subscription = subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED);
+
+        // 기존 nextBillingDate로 다시 결제 예약
+        schedulePayment(uId, userService.getBillingKey(uId), null, subscription.getNextBillingDate().atStartOfDay(ZoneOffset.UTC).toString());
+        // 구독 상태 ACTIVE로 변경
+        subscriptionService.modifySubscriptionStatusToActive(uId, SubscriptionStatus.CANCELED);
 
     }
 }
