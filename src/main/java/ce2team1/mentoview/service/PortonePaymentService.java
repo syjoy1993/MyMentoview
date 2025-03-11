@@ -185,6 +185,7 @@ public class PortonePaymentService {
         // 포트원 서버로 빌링키 결제 요청
         User user = userRepository.findById(uId).orElseThrow();
         String billingKey = user.getBillingKey();
+        System.out.println(billingKey);
 
         // paymentId 생성
         String paymentId = "payment-" + UUID.randomUUID().toString();
@@ -249,6 +250,9 @@ public class PortonePaymentService {
                     .block();
 
             System.out.println(response);
+            deleteBillingKey(billingKey);
+            userService.setBillingKey(uId, null);
+
         } catch (Exception e) {
             throw new SubscriptionException(e.getMessage() + " 구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -266,6 +270,28 @@ public class PortonePaymentService {
 
         return response;
     }
+
+    public void deleteBillingKey(String billingKey) throws JsonProcessingException {
+
+        String encodedBillingKey = URLEncoder.encode(billingKey, StandardCharsets.UTF_8);
+
+
+        try {
+            String response = webClient.method(HttpMethod.DELETE)
+                    .uri(baseUrl + "/billing-keys/" + encodedBillingKey)
+                    .headers(headers -> headers.set("Authorization", "PortOne " + portoneApiSecret))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            System.out.println(response);
+
+        } catch (Exception e) {
+            throw new SubscriptionException(e.getMessage() + " 구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 
     public void processChangingBillingKey(BillingKeyCheckDto billingKeyCheckDto) throws JsonProcessingException {
 

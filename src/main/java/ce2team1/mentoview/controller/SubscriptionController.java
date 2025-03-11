@@ -33,13 +33,13 @@ public class SubscriptionController {
 
     @Operation(summary = "구독 조회", description = "사용자의 모든 구독 내역과 구독 각각에 대한 결제 내역을 전달합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "구독 조회 성공")
+            @ApiResponse(responseCode = "200", description = "구독 조회에 성공했습니다.")
     })
     @GetMapping("/subscription")
     public ResponseEntity<List<SubscriptionResp>> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
-//        Long userId = 1L;
+//        Long userId = mvPrincipalDetails.getUserId();
+        Long userId = 1L;
 
         List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
@@ -52,13 +52,13 @@ public class SubscriptionController {
 
     @Operation(summary = "구독 상태 조회", description = "구독 처리 진행 상태를 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "구독 상태 조회를 성공하였습니다.")
+            @ApiResponse(responseCode = "200", description = "구독 상태 조회에 성공했습니다.")
     })
     @GetMapping("/subscription/status")
     public ResponseEntity<String> getSubscriptionStatus(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
-//        Long userId = 1L;
+//        Long userId = mvPrincipalDetails.getUserId();
+        Long userId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(userId, SubscriptionStatus.ACTIVE) != null) {
             return ResponseEntity.ok("구독 처리 완료");
@@ -69,21 +69,25 @@ public class SubscriptionController {
 
     @Operation(summary = "구독 해지", description = "결제 예약 취소 후 구독의 상태를 CANCELED로 변경합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "구독 해지 성공")
+            @ApiResponse(responseCode = "200", description = "구독 해지 요청이 성공적으로 처리됐습니다."),
+            @ApiResponse(responseCode = "404", description = "해당 구독은 유효하지 않습니다."),
+            @ApiResponse(responseCode = "500", description = "구독 해지 요청 처리 중 문제가 발생했습니다.")
+
     })
     @DeleteMapping("/subscription/{subscription_id}")
     public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
-        Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+//        Long uId = mvPrincipalDetails.getUserId();
+        Long uId = 1L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
-            // 결제 예약 취소
+            // 결제 예약 취소 후 빌링키 삭제
             portonePaymentService.cancelScheduling(uId);
 
             // 구독의 상태 변경
             subscriptionService.deleteSubscription(sId);
+
 
             return ResponseEntity.ok("구독 해지 성공");
         } else {
@@ -101,8 +105,8 @@ public class SubscriptionController {
     @PostMapping("/subscription")
     public ResponseEntity<String> createSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
-        Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+//        Long uId = mvPrincipalDetails.getUserId();
+        Long uId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) == null) {
             portonePaymentService.createPayment(uId);
