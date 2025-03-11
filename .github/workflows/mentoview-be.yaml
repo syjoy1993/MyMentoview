@@ -21,6 +21,7 @@ jobs:
 
     - name: Make application.properties
       run: |
+        mkdir -p ./src/main/resources
         cd ./src/main/resources
         touch ./application.properties
         echo "${{ secrets.PROPERTIES }}" > ./application.properties
