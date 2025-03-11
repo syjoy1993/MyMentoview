@@ -1,4 +1,4 @@
-name: App with Github Actions, mentoview
+name: App with Github Actions, mentoview-be
 
 on:
   # workflow_dispatch
