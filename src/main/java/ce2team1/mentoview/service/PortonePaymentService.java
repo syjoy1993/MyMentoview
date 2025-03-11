@@ -250,12 +250,12 @@ public class PortonePaymentService {
                     .block();
 
             System.out.println(response);
-            deleteBillingKey(billingKey);
-            userService.setBillingKey(uId, null);
-
         } catch (Exception e) {
-            throw new SubscriptionException(e.getMessage() + " 구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new SubscriptionException(e.getMessage() + "구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        deleteBillingKey(billingKey);
+        userService.setBillingKey(uId, null);
 
     }
 
@@ -287,7 +287,7 @@ public class PortonePaymentService {
             System.out.println(response);
 
         } catch (Exception e) {
-            throw new SubscriptionException(e.getMessage() + " 구독 취소 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new SubscriptionException(e.getMessage() + "빌링키 삭제 요청이 실패하였습니다. 잠시 후에 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
