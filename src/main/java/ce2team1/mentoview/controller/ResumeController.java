@@ -22,7 +22,8 @@ public class ResumeController {
     @GetMapping
     public ResponseEntity<List<ResumeResp>> getFullRes(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails ) {
 
-        Long userId = mvPrincipalDetails.getUserId();
+        // Long userId = mvPrincipalDetails.getUserId();
+       Long userId = 1L;
 
         List<ResumeResp> resumes = resumeService.getResumesByUserId(userId);
         return ResponseEntity.ok(resumes);
@@ -32,7 +33,8 @@ public class ResumeController {
     public ResponseEntity<ResumeResp> createRes(@RequestParam("file") MultipartFile file,
                                                 @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
+        // Long userId = mvPrincipalDetails.getUserId();
+        Long userId = 1L;
 
         ResumeDto resumeDto = resumeService.createResume(file, userId);
         ResumeResp response = ResumeResp.from(resumeDto);
@@ -43,7 +45,8 @@ public class ResumeController {
     public ResponseEntity<Void> deleteRes(@PathVariable Long resumeId,
                                           @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
+        // Long userId = mvPrincipalDetails.getUserId();
+        Long userId = 1L;
 
         resumeService.deleteResume(resumeId, userId);
         return ResponseEntity.ok().build();
