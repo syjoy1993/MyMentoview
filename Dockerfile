@@ -10,6 +10,9 @@ FROM joe1534/mentoview-tesseract:v3
 ENV TESSDATA_PREFIX=/usr/local/share
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
+# 타임존을 Asia/Seoul로 설정
+ENV TZ=Asia/Seoul
+
 ### 워킹 디렉토리 설정
 WORKDIR /app
 
@@ -17,4 +20,7 @@ WORKDIR /app
 COPY build/libs/*.jar app.jar
 
 ### app.jar 실행
-CMD ["java", "-jar", "app.jar"]
+#CMD ["java", "-jar", "app.jar"]
+
+# 타임존을 환경 변수로 설정하여 JVM 옵션으로 전달합니다.
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Duser.timezone=${TZ}", "-jar", "app.jar"]
