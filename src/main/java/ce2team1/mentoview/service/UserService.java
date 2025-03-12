@@ -6,7 +6,6 @@ import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.exception.ServiceException;
 import ce2team1.mentoview.repository.SubscriptionRepository;
 import ce2team1.mentoview.repository.UserRepository;
-import ce2team1.mentoview.security.dto.OAuth2ResponseSocial;
 import ce2team1.mentoview.service.dto.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +75,7 @@ public class UserService {
 
     }
 
-    // OAuth
+/*    // OAuth
     public User updateUser(User user, OAuth2ResponseSocial responseSocial) {
         user.updateSocialInfo(responseSocial.getProviderId());
         return userRepository.save(user);
@@ -91,13 +90,12 @@ public class UserService {
                 .providerId(responseSocial.getProviderId())
                 .status(UserStatus.ACTIVE)
                 .build();
-    }
+    }*/
 
     @Transactional
     public void setBillingKey(Long uId, String billingKey) {
         User user = userRepository.findById(uId).orElseThrow();
-
-        user.setBillingKey(billingKey);
+        userRepository.save(user.updateBillingKey(billingKey));
 
     }
 
