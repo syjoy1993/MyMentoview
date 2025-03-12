@@ -4,7 +4,7 @@
 # ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 ### Tesseract와 Leptonica가 설치된 베이스 이미지 사용
-FROM joe1534/mentoview-tesseract:[tag]
+FROM joe1534/mentoview-tesseract:v3
 
 ### 라이브러리 경로 설정 (Tesseract와 Leptonica)
 ENV TESSDATA_PREFIX=/usr/local/share
