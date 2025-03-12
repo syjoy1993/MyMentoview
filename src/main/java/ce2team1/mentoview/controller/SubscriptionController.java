@@ -38,8 +38,8 @@ public class SubscriptionController {
     @GetMapping("/subscription")
     public ResponseEntity<List<SubscriptionResp>> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
-//        Long userId = 1L;
+        // Long userId = mvPrincipalDetails.getUserId();
+       Long userId = 1L;
 
         List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
@@ -57,8 +57,8 @@ public class SubscriptionController {
     @GetMapping("/subscription/status")
     public ResponseEntity<String> getSubscriptionStatus(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
-        Long userId = mvPrincipalDetails.getUserId();
-//        Long userId = 1L;
+        // Long userId = mvPrincipalDetails.getUserId();
+       Long userId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(userId, SubscriptionStatus.ACTIVE) != null) {
             return ResponseEntity.ok("구독 처리 완료");
@@ -77,8 +77,8 @@ public class SubscriptionController {
     @DeleteMapping("/subscription/{subscription_id}")
     public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
-        Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+        // Long uId = mvPrincipalDetails.getUserId();
+       Long uId = 1L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
@@ -105,8 +105,8 @@ public class SubscriptionController {
     @PostMapping("/subscription")
     public ResponseEntity<String> createSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
-        Long uId = mvPrincipalDetails.getUserId();
-//        Long uId = 1L;
+        // Long uId = mvPrincipalDetails.getUserId();
+       Long uId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) == null) {
             portonePaymentService.createPayment(uId);
