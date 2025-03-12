@@ -93,6 +93,7 @@ public class SecurityConfig {
                 .anonymous(anonymous ->
                         anonymous.principal("anonymousUser").authorities("ROLE_ANONYMOUS"))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/api/auth/google", "/api/authorization/google/**", "/oauth2/authorization/google").permitAll()
                         .requestMatchers("/login/oauth2/code/google").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
@@ -121,7 +122,7 @@ public class SecurityConfig {
                 .anonymous(anonymous -> anonymous.
                         principal("anonymousUser")
                         .authorities("ROLE_ANONYMOUS"))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/**").permitAll().anyRequest().permitAll())
                 .addFilterBefore(mvLoginFormFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterAfter(mvRequestFilter, SecurityContextHolderFilter.class);
 
@@ -134,6 +135,7 @@ public class SecurityConfig {
         configureCommon(security);
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/api/signup/**").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated());
