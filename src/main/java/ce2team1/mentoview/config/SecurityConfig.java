@@ -89,12 +89,12 @@ public class SecurityConfig {
     public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity security,
                                                          AuthenticationManager authenticationManager) throws Exception {
         configureCommon(security);
-        security.securityMatcher("/oauth2/authorization/google", "/login/oauth2/code/**")// 이 URL만 처리함
+        security.securityMatcher("/api/oauth2/authorization/google", "/login/oauth2/code/**")// 이 URL만 처리함
                 .anonymous(anonymous ->
                         anonymous.principal("anonymousUser").authorities("ROLE_ANONYMOUS"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/api/auth/google", "/api/authorization/google/**", "/oauth2/authorization/google").permitAll()
+                        .requestMatchers("/api/auth/google", "/api/authorization/google/**", "/api/oauth2/authorization/google").permitAll()
                         .requestMatchers("/login/oauth2/code/google").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
                         .anyRequest().authenticated()
@@ -102,8 +102,8 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authEndpoint -> authEndpoint
-                                .authorizationRequestRepository(authorizationRequestRepository()))
-                        // .baseUri("/oauth2/authorization/google"))
+                                .authorizationRequestRepository(authorizationRequestRepository())
+                        .baseUri("/api/oauth2/authorization/google"))
                         .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig
                                 .baseUri("/login/oauth2/code/google"))
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(mvOAuth2UserService))
