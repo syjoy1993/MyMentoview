@@ -57,7 +57,7 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY }}
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: be-${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -76,7 +76,7 @@ jobs:
     
     - name: Set up Image
       run: |
-        sed -i "s%image: ${{ secrets.AWS_ECR_ID }}.dkr.ecr.${{ secrets.AWS_ECR_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:[a-zA-Z0-9]*%image: ${{ secrets.AWS_ECR_ID }}.dkr.ecr.${{ secrets.AWS_ECR_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:${{ github.sha }}%" ./BE/mv-be-manifest.yaml
+        sed -i "s%image: ${{ secrets.AWS_ECR_ID }}.dkr.ecr.${{ secrets.AWS_ECR_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:[a-zA-Z0-9]*%image: ${{ secrets.AWS_ECR_ID }}.dkr.ecr.${{ secrets.AWS_ECR_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REPOSITORY }}:be-${{ github.sha }}%" ./BE/mv-be-manifest.yaml
     
     - name: Commit and push changes
       run: |
