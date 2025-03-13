@@ -4,6 +4,7 @@ import ce2team1.mentoview.controller.dto.response.ResumeResp;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.service.ResumeService;
 import ce2team1.mentoview.service.dto.ResumeDto;
+import ce2team1.mentoview.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
