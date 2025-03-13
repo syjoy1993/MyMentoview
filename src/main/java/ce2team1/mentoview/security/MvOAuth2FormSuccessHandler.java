@@ -44,6 +44,11 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
             log.info("‼️‼️‼️‼️‼️‼️‼ OAuth2User 로그인 처리");
             UserDto userDto = UserDto.byOAuth2User(oAuth2User);
+            // 테스트
+            System.out.println("User Id -  " + userDto.getUserId());
+            System.out.println("User Name -  " + userDto.getName());
+            System.out.println("User Email -  " + userDto.getEmail());
+            
             mvPrincipalDetails = MvPrincipalDetails.of(userDto, oAuth2User.getAttributes());
 
         } else if (authentication.getPrincipal() instanceof UserDetails userDetails) {
