@@ -1,7 +1,7 @@
 package ce2team1.mentoview.security;
 
-import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,12 +25,13 @@ import java.io.PrintWriter;
 public class MvRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
-    @Override
+/*    @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         return path.startsWith("/api/oauth2/authorization") || path.startsWith("/api/login/oauth2/code");
-    }
+    }*/
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -73,12 +75,15 @@ public class MvRequestFilter extends OncePerRequestFilter {
         }
 
         String emailFromToken = jwtTokenProvider.getEmailFromToken(authToken);
-        Role roleFromToken = jwtTokenProvider.getRoleFromToken(authToken);
+        //Role roleFromToken = jwtTokenProvider.getRoleFromToken(authToken);
+        UserDto userDto = userService.findByEmail(emailFromToken);
 
 
-        MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(UserDto.of(emailFromToken, roleFromToken));
+        MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(userDto);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(mvPrincipalDetails,null, mvPrincipalDetails.getAuthorities());
         // null, 비번
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         filterChain.doFilter(request, response);
