@@ -12,7 +12,8 @@ public interface InterviewQuestionRepository extends JpaRepository<InterviewQues
     @Query("SELECT iq FROM InterviewQuestion iq " +
             "JOIN FETCH iq.interviewResponse ir " +
             "JOIN FETCH iq.interviewFeedback ifb " +
-            "WHERE iq.interview.interviewId = :interviewId")
+            "WHERE iq.interview.interviewId = :interviewId " +
+            "ORDER BY iq.questionId ASC")
     List<InterviewQuestion> findQuestionsWithResponsesAndFeedback(Long interviewId);
 
     List<InterviewQuestion> findAllByQuestionIdIn(Collection<Long> questionIds);
