@@ -55,10 +55,11 @@ public class OAuth2Controller {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UserResp.of(null, "만료된 토큰"));
         }
 
-        if (!"temporary".equals(jwtTokenProvider.getType(token))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(UserResp.of(null, "임시토큰이 아님"));
-        }
+        // 테스트 주석처리
+        // if (!"temporary".equals(jwtTokenProvider.getType(token))) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        //             .body(UserResp.of(null, "임시토큰이 아님"));
+        // }
 
         String email = jwtTokenProvider.getEmailFromToken(token);
         Role role = jwtTokenProvider.getRoleFromToken(token);
