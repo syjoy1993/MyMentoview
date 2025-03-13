@@ -25,9 +25,8 @@ public class ResumeController {
 
         System.out.println("principal - " + mvPrincipalDetails);
         UserDto dto = mvPrincipalDetails.getUserDto();
-        System.out.println("email - " + dto.getEmail());
-        System.out.println("name - " + dto.getName());
-        System.out.println("id - " + dto.getUserId());
+        System.out.println("UserDto - " + dto);
+
         Long userId = mvPrincipalDetails.getUserId();
        // Long userId = 1L;
 
