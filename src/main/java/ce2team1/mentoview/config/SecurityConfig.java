@@ -135,6 +135,7 @@ public class SecurityConfig {
         configureCommon(security);
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/api/signup/**").permitAll()
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
@@ -161,7 +162,3 @@ public class SecurityConfig {
         return filter;
     }
 }
-
-
-
-
