@@ -15,9 +15,10 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3001", "https://mentoview.site"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "multipart/form-data"));
+        configuration.setAllowedOrigins(Arrays.asList("https://mentoview.site", "http://localhost:3000", "http://localhost:3001"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
