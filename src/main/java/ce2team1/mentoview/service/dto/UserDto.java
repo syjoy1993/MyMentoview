@@ -20,6 +20,7 @@ import java.util.Objects;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class UserDto {
     private Long userId;
     private String email;
