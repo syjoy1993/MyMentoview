@@ -60,16 +60,17 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
                         )
                 )));
 
-        log.info(" ✅  저장된 사용자: {}", repositoryUser);
+        UserDto userDto = UserDto.toDto(repositoryUser);
+        log.info(" ✅  저장된 사용자: {}", userDto);
 
         // ✅ OAuth2User -> MvPrincipalDetails 변환
         MvPrincipalDetails mvPrincipalDetails;
         if (oAuth2User instanceof OidcUser oidcUser) {
             log.info(" ✈️✈️✈️ OidcUser ");
-            mvPrincipalDetails = MvPrincipalDetails.of(UserDto.toDto(repositoryUser), oidcUser);
+            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oidcUser);
         } else {
             log.info(" ⛴️⛴️⛴️ OAuth2User ");
-            mvPrincipalDetails = MvPrincipalDetails.of(UserDto.toDto(repositoryUser), oAuth2User.getAttributes());
+            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oAuth2User.getAttributes());
         }
         return mvPrincipalDetails;
     }
