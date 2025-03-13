@@ -46,6 +46,8 @@ public class OAuth2Controller {
                                              HttpServletRequest request) {
 
         log.info("mvPrincipalDetails: {}", mvPrincipalDetails);
+        UserDto dto = mvPrincipalDetails.getUserDto();
+        System.out.println("dto: " + dto);
 
         String existingToken = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
                 .orElseThrow(() -> new AuthenticationServiceException("미인증 유저"));
