@@ -1,7 +1,7 @@
 package ce2team1.mentoview.security;
 
-import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 public class MvRequestFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -73,10 +74,11 @@ public class MvRequestFilter extends OncePerRequestFilter {
         }
 
         String emailFromToken = jwtTokenProvider.getEmailFromToken(authToken);
-        Role roleFromToken = jwtTokenProvider.getRoleFromToken(authToken);
+
+        UserDto userDto = userService.findByEmail(emailFromToken);
 
 
-        MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(UserDto.of(emailFromToken, roleFromToken));
+        MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(userDto);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(mvPrincipalDetails,null, mvPrincipalDetails.getAuthorities());
         // null, 비번
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
