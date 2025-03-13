@@ -75,7 +75,7 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         // 우리가 만든 refreshToken 디비로 저장
         refreshTokenService.updateOrAddRefreshToken(userEmail, realRefreshToken, jwtTokenProvider.getRefreshTokenExpiration());
 
-        String tokenUrl = String.format("http://localhost:3000/google-login?token=%s", temporaryToken);
+        String tokenUrl = String.format("https://mentoview.site/google-login?token=%s", temporaryToken);
         response.sendRedirect(tokenUrl);
 
 
