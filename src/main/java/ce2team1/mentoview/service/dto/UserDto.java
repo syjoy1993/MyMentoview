@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * DTO for {@link User}
@@ -38,13 +37,15 @@ public class UserDto {
     public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, UserStatus status, String billingKey) {
         return new UserDto(userId, email, password, name, role, socialProvider, providerId, status, null);
     }
-    public static UserDto of(String email, Role role) {
+    public static UserDto of(String email, Role role,  Long userId) {
         return UserDto.builder()
+                .userId(userId)
                 .email(email)
                 .password(null)
                 .role(role)
                 .build();
     }
+/*
     public static UserDto ofForm(String email, String password, Role role) {
         Objects.requireNonNull(password, "폼 로그인 시 비밀번호는 필수입니다.");
         return UserDto.builder()
@@ -60,6 +61,7 @@ public class UserDto {
                 .password(newPassword)
                 .build();
     }
+*/
 
 
     public static UserDto toDto(User user) {
