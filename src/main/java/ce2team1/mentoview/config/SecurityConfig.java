@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -144,8 +145,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
 
-        security.addFilterBefore(new LambdaRequestFilter("/api/interview/response/transcription"), UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        return security.build();
+    }
+
+    @Bean
+    @Order(0) // 우선순위를 최상위로 지정
+    public SecurityFilterChain lambdaSecurityFilterChain(HttpSecurity security) throws Exception {
+        security
+                .securityMatcher("/api/interview/response/transcription")
+                .addFilterBefore(new LambdaRequestFilter("/api/interview/response/transcription"), UsernamePasswordAuthenticationFilter.class)
+                // 검증 후, 추가 필터 없이 통과시키기 위해 permitAll 설정
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+
         return security.build();
     }
 
