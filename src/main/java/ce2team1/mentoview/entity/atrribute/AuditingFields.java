@@ -22,7 +22,7 @@ public class AuditingFields {
 
 
     @CreatedBy
-    @Column(name = "created_by",updatable = false, length = 20)
+    @Column(name = "created_by",updatable = false, length = 50)
     protected String createdBy;
 
     @LastModifiedDate
@@ -30,6 +30,6 @@ public class AuditingFields {
     protected LocalDateTime modifiedAt;
 
     @LastModifiedBy
-    @Column(name = "modified_by", updatable = true, length = 20)
+    @Column(name = "modified_by", updatable = true, length = 50)
     protected String modifiedBy;
 }
