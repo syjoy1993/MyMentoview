@@ -5,6 +5,7 @@ import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.entity.atrribute.SocialProvider;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
+import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import lombok.*;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,6 +19,7 @@ import java.util.Map;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class UserDto {
     private Long userId;
     private String email;
@@ -116,6 +118,10 @@ public class UserDto {
                 .role(Role.USER)
                 .status(UserStatus.ACTIVE)
                 .build();
+    }
+
+    public static UserDto byOAuth2User(MvPrincipalDetails principalDetails) {
+        return principalDetails.getUserDto();
     }
 
 }

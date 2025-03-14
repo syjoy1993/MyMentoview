@@ -7,10 +7,10 @@ import ce2team1.mentoview.exception.ServiceException;
 import ce2team1.mentoview.repository.SubscriptionRepository;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.service.dto.UserDto;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -104,10 +104,13 @@ public class UserService {
         return user.getBillingKey();
     }
 
+    @Transactional(readOnly = true)
     public UserDto findByEmail(String email) {
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new ServiceException("User not found"));
+
+        System.out.println("유저 id - " + user.getUserId());
         return UserDto.toDto(user);
     }
 }

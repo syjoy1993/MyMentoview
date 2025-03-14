@@ -85,8 +85,9 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
 
         return web -> web.ignoring().requestMatchers("/img/**")
+                .requestMatchers("/api/management/**")
                 .requestMatchers("/api/test")
-                .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**", "api/swagger-resources/**") //swagger
+                .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**", "/api/swagger-resources/**") //swagger
                 .requestMatchers("/", "/favicon.ico", "/static", "/about", "/contactus")
                 .requestMatchers("/error", "/error/**");
 
@@ -138,8 +139,8 @@ public class SecurityConfig {
         configureCommon(security);
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/api/signup/**").permitAll()
+                        .requestMatchers("/api/**").hasRole("USER")
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
 

@@ -76,8 +76,8 @@ public class MvRequestFilter extends OncePerRequestFilter {
 
         String emailFromToken = jwtTokenProvider.getEmailFromToken(authToken);
         //Role roleFromToken = jwtTokenProvider.getRoleFromToken(authToken);
+      
         UserDto userDto = userService.findByEmail(emailFromToken);
-
 
         MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(userDto);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(mvPrincipalDetails,null, mvPrincipalDetails.getAuthorities());
