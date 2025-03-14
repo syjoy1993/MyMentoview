@@ -144,6 +144,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
 
+        security.addFilterBefore(new LambdaRequestFilter("/api/interview/response/transcription"), UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return security.build();
     }
