@@ -127,7 +127,7 @@ public class SecurityConfig {
         security.securityMatcher("/api/login") // 폼 로그인 요청만 매칭
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .addFilterBefore(mvLoginFormFilter, UsernamePasswordAuthenticationFilter.class);
-        security.addFilterAfter(mvRequestFilter, SecurityContextHolderFilter.class);
+        //security.addFilterAfter(mvRequestFilter, SecurityContextHolderFilter.class);
 
         return security.build();
 
