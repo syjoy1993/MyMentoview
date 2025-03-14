@@ -42,6 +42,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final MvRequestFilter mvRequestFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final WebhookFilter webhookFilter;
 
 
     @Bean
@@ -141,10 +142,12 @@ public class SecurityConfig {
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/api/signup/**").permitAll()
+                        .requestMatchers("/api/webhook/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
 
+        security.addFilterBefore(webhookFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return security.build();
     }
