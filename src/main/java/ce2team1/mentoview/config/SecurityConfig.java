@@ -41,6 +41,7 @@ public class SecurityConfig {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final MvRequestFilter mvRequestFilter;
+    private final LambdaRequestFilter lambdaFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final WebhookFilter webhookFilter;
 
@@ -141,26 +142,16 @@ public class SecurityConfig {
         configureCommon(security);
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
+                        .requestMatchers("/api/interview/response/transcription").permitAll()
                         .requestMatchers("/api/signup/**").permitAll()
                         .requestMatchers("/api/webhook/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .requestMatchers("/api/auth/me").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN"));
 
+        security.addFilterBefore(lambdaFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(webhookFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return security.build();
-    }
-
-    @Bean
-    @Order(0) // 우선순위를 최상위로 지정
-    public SecurityFilterChain lambdaSecurityFilterChain(HttpSecurity security) throws Exception {
-        security
-                .securityMatcher("/api/interview/response/transcription")
-                .addFilterBefore(new LambdaRequestFilter("/api/interview/response/transcription"), UsernamePasswordAuthenticationFilter.class)
-                // 검증 후, 추가 필터 없이 통과시키기 위해 permitAll 설정
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-
         return security.build();
     }
 
