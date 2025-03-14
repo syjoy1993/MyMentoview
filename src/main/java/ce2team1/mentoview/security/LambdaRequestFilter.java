@@ -7,17 +7,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Slf4j
+@Component
 public class LambdaRequestFilter extends OncePerRequestFilter {
 
     private final RequestMatcher requestMatcher;
+    private static final String ENDPOINT = "/api/interview/response/transcription";
 
-    public LambdaRequestFilter(String apiEndpoint) {
-        this.requestMatcher = new AntPathRequestMatcher(apiEndpoint);
+    public LambdaRequestFilter() {
+        this.requestMatcher = new AntPathRequestMatcher(ENDPOINT);
     }
 
     @Override
