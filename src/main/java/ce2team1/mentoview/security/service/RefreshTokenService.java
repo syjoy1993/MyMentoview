@@ -5,6 +5,9 @@ import ce2team1.mentoview.security.dto.RefreshTokenDto;
 import ce2team1.mentoview.security.entity.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +50,19 @@ public class RefreshTokenService {
                     .expirationDate(expirationDate)
                     .build();
             RefreshToken existedToken = refreshTokenRepository.save(updateRefreshToken);
-
         }
+    }
+    public void deleteRefreshToken(String email) {
+        refreshTokenRepository.deleteByUserEmail(email);
 
     }
+
+    public RefreshTokenDto findByEmail(String email) {
+        RefreshToken refreshToken = refreshTokenRepository.findByUserEmail(email).orElseThrow(
+                () -> new AuthenticationServiceException("No refresh token found for email: " + email));
+        return RefreshTokenDto.toDto(refreshToken);
+
+    }
+
 
 }
