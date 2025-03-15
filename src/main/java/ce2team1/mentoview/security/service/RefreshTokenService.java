@@ -52,6 +52,7 @@ public class RefreshTokenService {
             RefreshToken existedToken = refreshTokenRepository.save(updateRefreshToken);
         }
     }
+    @Transactional(readOnly = false)
     public void deleteRefreshToken(String email) {
         refreshTokenRepository.deleteByUserEmail(email);
 
