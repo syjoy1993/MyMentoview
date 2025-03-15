@@ -1,6 +1,7 @@
 package ce2team1.mentoview.security;
 
 import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.security.dto.LoginType;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import ce2team1.mentoview.service.dto.UserDto;
@@ -34,31 +35,24 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         log.info("‼️‼️‼️‼️‼️‼️‼️  OAuth2 로그인 성공: {}", authentication.getPrincipal().getClass());
 
         MvPrincipalDetails mvPrincipalDetails;
-        if (authentication.getPrincipal() instanceof OidcUser oidcUser) {
+        if (authentication.getPrincipal() instanceof MvPrincipalDetails principalDetails) {
+            log.info("‼️‼️‼️‼️ MvPrincipalDetails 로그인 처리");
+            mvPrincipalDetails = principalDetails;
 
-            log.info("‼️‼️‼️‼️‼️‼️‼ OidcUser 로그인 처리");
+        } else if (authentication.getPrincipal() instanceof OidcUser oidcUser) {
+            log.info("‼️‼️‼️‼️‼️‼️‼️ OidcUser 로그인 처리");
             UserDto userDto = UserDto.byOAuth2User(oidcUser);
-            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oidcUser);
+            mvPrincipalDetails = MvPrincipalDetails.of(userDto, LoginType.OIDC);
 
-        } else if (authentication.getPrincipal() instanceof MvPrincipalDetails oAuth2User) {
-
-            log.info("‼️‼️‼️‼️‼️‼️‼ OAuth2User 로그인 처리");
+        } else if (authentication.getPrincipal() instanceof OAuth2User oAuth2User) {
+            log.info("‼️‼️‼️‼️‼️‼️‼️ OAuth2User 로그인 처리");
             UserDto userDto = UserDto.byOAuth2User(oAuth2User);
-            // 테스트
-            System.out.println("User Id -  " + userDto.getUserId());
-            System.out.println("User Name -  " + userDto.getName());
-            System.out.println("User Email -  " + userDto.getEmail());
-            
-            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oAuth2User.getAttributes());
+            mvPrincipalDetails = MvPrincipalDetails.of(userDto, LoginType.OAUTH2);
 
-        } else if (authentication.getPrincipal() instanceof UserDetails userDetails) {
-
-            log.info("‼️‼️‼️‼️‼️‼️‼ UserDetails 로그인 처리");
-            mvPrincipalDetails = (MvPrincipalDetails) userDetails;
-
-        }else {
-            throw new IllegalStateException("지원하지 않는 OAuth2 인증 타입입니다.");
+        } else {
+            throw new IllegalStateException("지원하지 않는 인증 타입입니다: " + authentication.getPrincipal().getClass());
         }
+
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(mvPrincipalDetails, null, mvPrincipalDetails.getAuthorities());
 

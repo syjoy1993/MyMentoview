@@ -24,20 +24,20 @@ public class RefreshToken {
     @Column(nullable = false)
     private LocalDateTime maxExpirationDate;
 
-    public static RefreshToken of(String email, String refreshToken, LocalDateTime expirationDate) {
+    public static RefreshToken of(String userEmail, String refreshToken, LocalDateTime expirationDate) {
         return new RefreshToken(
                 null,
-                email,
+                userEmail,
                 refreshToken,
                 expirationDate,
                 expirationDate.plusDays(MAX_EXPIRATION_DAYS)
         );
     }
 
-    public static RefreshToken of(Long id, String email, String refreshToken, LocalDateTime expirationDate) {
+    public static RefreshToken of(Long id, String userEmail, String refreshToken, LocalDateTime expirationDate) {
         return new RefreshToken(
                 id,
-                email,
+                userEmail,
                 refreshToken,
                 expirationDate,
                 expirationDate.plusDays(MAX_EXPIRATION_DAYS)
