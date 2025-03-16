@@ -34,6 +34,8 @@ public class RefreshTokenService {
     @Transactional(readOnly = false)
     public void updateOrAddRefreshToken(String userEmail, String realRefreshToken, Long expiration) {
 
+        log.info("‼️‼️‼️‼️‼️‼️‼️userEmail 확인 = {}", userEmail); // 메서드 호출 전
+
         LocalDateTime expirationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiration), ZoneId.of("Asia/Seoul")); //테이블용 시간
 
         RefreshTokenDto tokenDto = RefreshTokenDto.of(userEmail, realRefreshToken, expirationDate); //RefreshDto 토큰 객체
@@ -42,7 +44,6 @@ public class RefreshTokenService {
 
         if (!existToken.isPresent()) { // 디비에 객체 없어?
             RefreshToken newRefreshToken = refreshTokenRepository.save(RefreshToken.toEntity(tokenDto));
-
 
         }  else {// 디비에 객체 있어?
             RefreshToken updateRefreshToken = existToken.get().toBuilder()

@@ -60,27 +60,33 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         log.info("️‼️‼️‼️‼️‼️‼  SecurityContext에 저장된 Authentication: {}", SecurityContextHolder.getContext().getAuthentication());
 
-
         String userEmail = mvPrincipalDetails.getName();
+        log.info("‼️‼️‼11111111‼️‼️‼️‼️userEmail 확인 = {}", userEmail);
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
 
         String role = auth.getAuthority();
+        log.info("‼️‼️‼️222‼️‼️‼️‼️userEmail 확인 = {}", userEmail);
         String temporaryToken = jwtTokenProvider.createTemporaryToken(userEmail, Role.toCode(role));// 2분
 
         String realRefreshToken = jwtTokenProvider.createRefreshToken(userEmail, Role.toCode(role));// 7일
         // 우리가 만든 refreshToken 디비로 저장
+        log.info("‼️‼️‼️333333‼️‼️‼️‼️userEmail 확인 = {}", userEmail);
         refreshTokenService.updateOrAddRefreshToken(userEmail, realRefreshToken, jwtTokenProvider.getRefreshTokenExpiration());
 
-        String tokenUrl = String.format("https://mentoview.site/google-login?token=%s", temporaryToken);
+        String tokenUrl;        //= String.format("http://localhost:3000/google-login?token=%s", temporaryToken);
+
+        if (mvPrincipalDetails.getPassword() == null || mvPrincipalDetails.getPassword().isEmpty()) {
+            tokenUrl = String.format("http://localhost:3000/mv-login?token=%s&ndg=%s", temporaryToken, "fa");
+        } else {
+            tokenUrl = String.format("http://localhost:3000/mv-login?token=%s&ndg=%s", temporaryToken, "tu");
+        }
         response.sendRedirect(tokenUrl);
 
-
-        log.info("jwtCookie{}" , temporaryToken);
-        log.info("jwtCookie{} 드림" , temporaryToken);
-
+        log.info("jwt{}" , temporaryToken);
+        log.info("jwt{} 드림" , temporaryToken);
     }
 
 }

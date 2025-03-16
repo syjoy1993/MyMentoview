@@ -82,8 +82,8 @@ public class MvRequestFilter extends OncePerRequestFilter {
         MvPrincipalDetails mvPrincipalDetails = MvPrincipalDetails.of(userDto);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(mvPrincipalDetails,null, mvPrincipalDetails.getAuthorities());
         // null, 비번
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authenticationToken);
+        //SecurityContext context = SecurityContextHolder.createEmptyContext();
+        //context.setAuthentication(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         filterChain.doFilter(request, response);
