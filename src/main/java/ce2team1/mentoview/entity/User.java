@@ -28,7 +28,7 @@ public class User extends AuditingFields {
     @Column(unique = true, nullable = false)
     private String email; // OAuth + 폼
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String password;//폼전용
 
     private String name;
