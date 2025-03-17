@@ -51,7 +51,7 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
                 .orElseGet(() -> userRepository.save(User.toEntity(
                         UserDto.of(
                                 responseSocial.getEmail(),
-                                null,
+                                "",
                                 responseSocial.getName(),
                                 Role.USER,
                                 responseSocial.getProvider(),
