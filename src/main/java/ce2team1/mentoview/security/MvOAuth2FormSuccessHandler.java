@@ -78,7 +78,7 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         String tokenUrl;        //= String.format("http://localhost:3000/google-login?token=%s", temporaryToken);
 
-        if (mvPrincipalDetails.getLoginType() != LoginType.FORM || mvPrincipalDetails.getPassword().isEmpty() ) {
+        if (mvPrincipalDetails.getLoginType() != LoginType.FORM && mvPrincipalDetails.getPassword().isEmpty() ) {
             tokenUrl = String.format("https://mentoview.site/mv-login?token=%s&ndg=%s", temporaryToken, "fa");
         } else {
             tokenUrl = String.format("https://mentoview.site/mv-login?token=%s&ndg=%s", temporaryToken, "tu");
