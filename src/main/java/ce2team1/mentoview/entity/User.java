@@ -48,11 +48,10 @@ public class User extends AuditingFields {
     private String billingKey;
 
     public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status, String billingKey ) {
-
         return new User(
                 null,
                 email,
-                password,  // ✅ 소셜 로그인 사용자는 비밀번호 입력 필수
+                password != null ? password : "",  // ✅ 소셜 로그인 사용자는 비밀번호 입력 필수
                 name,
                 role != null ? role : Role.USER,  // 기본값: USER
                 socialProvider,

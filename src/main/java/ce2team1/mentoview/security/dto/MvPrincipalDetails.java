@@ -60,7 +60,10 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     @Override
     public String getPassword() {
-        return userDto.getPassword();
+        if (userDto == null) {
+            return "";
+        }
+        return userDto.getPassword() != null ? userDto.getPassword() : "";
     }
 
     public Long getUserId() { // Long id
@@ -71,7 +74,8 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
         return UserDto.builder()
                 .userId(mvPrincipalDetails.getUserId())
                 .email(mvPrincipalDetails.getName())
-                .name(mvPrincipalDetails.getUsername())
+                .password(mvPrincipalDetails.getPassword() != null ? mvPrincipalDetails.getPassword() : "")
+                .name(mvPrincipalDetails.getRealName())
                 .build();
     }
 
