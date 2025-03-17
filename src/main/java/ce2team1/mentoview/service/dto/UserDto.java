@@ -41,7 +41,7 @@ public class UserDto {
         return UserDto.builder()
                 .userId(userId)
                 .email(email)
-                .password(null)
+                .password("")
                 .role(role)
                 .build();
     }
