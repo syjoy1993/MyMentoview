@@ -92,8 +92,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**", "/api/swagger-resources/**") //swagger
                 .requestMatchers("/", "/favicon.ico", "/static", "/about", "/contactus")
                 .requestMatchers("/error", "/error/**");
-
     }
+
     @Bean
     public SecurityFilterChain monitoringSecurityFilterChain(HttpSecurity security) throws Exception {
         configureCommon(security);
