@@ -83,6 +83,10 @@ public class MvOAuth2FormSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         } else {
             tokenUrl = String.format("https://mentoview.site/mv-login?token=%s&ndg=%s", temporaryToken, "tu");
         }
+
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.sendRedirect(tokenUrl);
 
         log.info("jwt{}" , temporaryToken);
