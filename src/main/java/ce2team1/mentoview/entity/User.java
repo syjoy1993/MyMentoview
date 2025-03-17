@@ -28,7 +28,7 @@ public class User extends AuditingFields {
     @Column(unique = true, nullable = false)
     private String email; // OAuth + 폼
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String password;//폼전용
 
     private String name;
@@ -65,7 +65,7 @@ public class User extends AuditingFields {
         return User.builder()
                 .userId(userDto.getUserId())
                 .email(userDto.getEmail())
-                .password(userDto.getPassword())
+                .password(userDto.getPassword()  != null ? userDto.getPassword() : "")
                 .name(userDto.getName())
                 .role(userDto.getRole())
                 .socialProvider(userDto.getSocialProvider())
