@@ -20,6 +20,7 @@ public class WebhookFilter extends OncePerRequestFilter {
 
         // 요청 경로 확인
         String requestUri = request.getRequestURI();
+        System.out.println("요청 경로 확인 : " + requestUri);
         if (!requestUri.startsWith("/api/webhook/")) {
             // 해당 경로가 아니면 필터를 통과
             chain.doFilter(request, response);
