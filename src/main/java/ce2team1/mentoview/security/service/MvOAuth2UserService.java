@@ -5,6 +5,7 @@ import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.security.dto.GoogleOAuth2Response;
+import ce2team1.mentoview.security.dto.LoginType;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.dto.OAuth2ResponseSocial;
 import ce2team1.mentoview.service.dto.UserDto;
@@ -67,10 +68,10 @@ public class MvOAuth2UserService extends DefaultOAuth2UserService {
         MvPrincipalDetails mvPrincipalDetails;
         if (oAuth2User instanceof OidcUser oidcUser) {
             log.info(" ✈️✈️✈️ OidcUser ");
-            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oidcUser);
+            mvPrincipalDetails = MvPrincipalDetails.of(UserDto.toDto(repositoryUser), oidcUser, LoginType.OIDC);
         } else {
             log.info(" ⛴️⛴️⛴️ OAuth2User ");
-            mvPrincipalDetails = MvPrincipalDetails.of(userDto, oAuth2User.getAttributes());
+            mvPrincipalDetails = MvPrincipalDetails.of(UserDto.toDto(repositoryUser), oAuth2User.getAttributes(),LoginType.OAUTH2);
         }
         return mvPrincipalDetails;
     }
