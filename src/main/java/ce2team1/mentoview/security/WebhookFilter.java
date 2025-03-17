@@ -20,7 +20,6 @@ public class WebhookFilter extends OncePerRequestFilter {
 
         // 요청 경로 확인
         String requestUri = request.getRequestURI();
-        System.out.println("요청 경로 확인 : " + requestUri);
         
         if (!requestUri.startsWith("/api/webhook/")) {
             // 해당 경로가 아니면 필터를 통과
@@ -30,11 +29,9 @@ public class WebhookFilter extends OncePerRequestFilter {
 
         // X-Forwarded-For 헤더에서 클라이언트 IP 주소 가져오기
         String remoteAddr = request.getHeader("X-Forwarded-For");
-        System.out.println("X-Forwarded-For 헤더: " + remoteAddr);
 
         // X-Forwarded-For가 없거나 비어있으면 기본 remoteAddr 가져오기
         if (remoteAddr == null || remoteAddr.isEmpty()) {
-            System.out.println("X-Forwarded-For 가 비어있는 상태");
             remoteAddr = request.getRemoteAddr();
         } else {
             // X-Forwarded-For 헤더는 여러 IP 주소를 포함할 수 있으므로,
