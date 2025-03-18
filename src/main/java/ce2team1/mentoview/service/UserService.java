@@ -47,7 +47,6 @@ public class UserService {
 
         User findUser = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
 
-
         if(findUser.getPassword() == null || findUser.getPassword().isEmpty()) {
             throw new ServiceException("Password is empty");
         }
@@ -63,34 +62,17 @@ public class UserService {
     public void changePassword(Long userId, String beforePassword, String afterPassword) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
-        UserDto userDto = UserDto.toDto(user);
+        //UserDto userDto = UserDto.toDto(user);
 
-        if (!passwordEncoder.matches(beforePassword, userDto.getPassword())) {
+        if (!passwordEncoder.matches(beforePassword, user.getPassword())) {
             throw new ServiceException("Password does not match");
         }
+
         UserDto changed = UserDto.toDto(user).toBuilder()
                 .password(passwordEncoder.encode(afterPassword))
                 .build();
         userRepository.save(User.toEntity(changed));
-
     }
-
-/*    // OAuth
-    public User updateUser(User user, OAuth2ResponseSocial responseSocial) {
-        user.updateSocialInfo(responseSocial.getProviderId());
-        return userRepository.save(user);
-    }
-    // OAuth
-    public User createUser(OAuth2ResponseSocial responseSocial) {
-        return User.builder()
-                .email(responseSocial.getEmail())
-                .name(responseSocial.getName())
-                .role(Role.USER)
-                .socialProvider(responseSocial.getProvider())
-                .providerId(responseSocial.getProviderId())
-                .status(UserStatus.ACTIVE)
-                .build();
-    }*/
 
     @Transactional
     public void setBillingKey(Long uId, String billingKey) {
@@ -123,6 +105,20 @@ public class UserService {
                 .password(passwordEncoder.encode(password))
                 .build();
         userRepository.save(User.toEntity(newUserDto));
+
+    }
+
+    public UserDto findByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
+        return UserDto.toDto(user);
+    }
+
+    @Transactional(readOnly = false)
+    public void softDelete(Long userId) {
+        UserDto userDto = UserDto.toDto(userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found")));
+        if(userDto.getBillingKey()!=null) {
+
+        }
 
     }
 }

@@ -85,8 +85,14 @@ public class UserController {
 
         return ResponseEntity.ok("비밀번호 변경 성공");
 
+
     }
 
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "탈퇴 성공"),
+            @ApiResponse(responseCode = "400", description = "권한 없음")
+    })
     @DeleteMapping("/mypage/delete/{id}")
     public ResponseEntity<String> userDelete(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails,
                                              @PathVariable Long id) {
@@ -95,6 +101,7 @@ public class UserController {
         if (!userId.equals(id)) {
             throw new UserException( "삭제할 권한이 없습니다.", HttpStatus.NOT_FOUND);
         }
+        userService.softDelete(userId);
 
         return ResponseEntity.ok("삭제완료");
     }
