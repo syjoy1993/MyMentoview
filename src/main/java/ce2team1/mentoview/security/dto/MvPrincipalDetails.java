@@ -86,7 +86,7 @@ public class MvPrincipalDetails implements OAuth2User, UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return userDto.getStatus() == UserStatus.ACTIVE;
+        return userDto.getStatus() != UserStatus.DELETED;
     }
 
     @Override

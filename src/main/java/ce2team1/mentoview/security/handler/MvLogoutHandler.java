@@ -1,6 +1,7 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.handler;
 
 import ce2team1.mentoview.exception.ServiceException;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

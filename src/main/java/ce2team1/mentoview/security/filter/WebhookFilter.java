@@ -1,4 +1,4 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

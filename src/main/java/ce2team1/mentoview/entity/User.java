@@ -47,6 +47,7 @@ public class User extends AuditingFields {
 
     private String billingKey;
 
+
     public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status, String billingKey ) {
         return new User(
                 null,
@@ -70,15 +71,11 @@ public class User extends AuditingFields {
                 .socialProvider(userDto.getSocialProvider())
                 .providerId(userDto.getProviderId())
                 .status(userDto.getStatus())
+                .billingKey(userDto.getBillingKey())
                 .build();
 
     }
-/*
-    // OAuth2용
-    public void updateSocialInfo(String newProviderId) {
-        this.providerId = newProviderId;
-    }
-*/
+
 
     public User updateBillingKey(String billingKey) {
         return this.toBuilder()

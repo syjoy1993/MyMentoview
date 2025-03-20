@@ -1,6 +1,6 @@
 package ce2team1.mentoview.config;
 
-import ce2team1.mentoview.security.JwtTokenProvider;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

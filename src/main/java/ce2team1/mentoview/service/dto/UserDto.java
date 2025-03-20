@@ -32,37 +32,20 @@ public class UserDto {
     private String billingKey;
 
     public static UserDto of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, UserStatus status, String billingKey) {
-        return new UserDto(null, email, password, name, role, socialProvider, providerId,  status, null);
+        return new UserDto(null, email, password, name, role, socialProvider, providerId,  status != null ? status : UserStatus.ACTIVE, null);
     }
     public static UserDto of(Long userId,String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, UserStatus status, String billingKey) {
-        return new UserDto(userId, email, password, name, role, socialProvider, providerId, status, null);
+        return new UserDto(userId, email, password, name, role, socialProvider, providerId, status != null ? status : UserStatus.ACTIVE, null);
     }
-    public static UserDto of(String email, Role role,  Long userId) {
+    public static UserDto of(String email, Role role,  Long userId, UserStatus status) {
         return UserDto.builder()
                 .userId(userId)
                 .email(email)
                 .password("")
                 .role(role)
+                .status(status != null ? status : UserStatus.ACTIVE)
                 .build();
     }
-/*
-    public static UserDto ofForm(String email, String password, Role role) {
-        Objects.requireNonNull(password, "폼 로그인 시 비밀번호는 필수입니다.");
-        return UserDto.builder()
-                .email(email)
-                .password(password)
-                .role(role)
-                .build();
-    }
-
-    public UserDto updatePassword(String newPassword) {
-        Objects.requireNonNull(newPassword, "새로운 비밀번호는 null이 될 수 없습니다.");
-        return this.toBuilder()
-                .password(newPassword)
-                .build();
-    }
-*/
-
 
     public static UserDto toDto(User user) {
         return UserDto.builder()
@@ -88,10 +71,10 @@ public class UserDto {
                 .status(user.getStatus())
                 .build();
     }
+
     public static UserDto byOAuth2User(OAuth2User  oAuth2User) {
         String email = null;
         String name = null;
-
 
         if(oAuth2User instanceof OidcUser oidcUser) {
             Map<String, Object> claims = oidcUser.getClaims();
@@ -117,7 +100,7 @@ public class UserDto {
                 .email(email)
                 .name(name)
                 .role(Role.USER)
-                .status(UserStatus.ACTIVE)
+               // .status(null)
                 .build();
     }
 
