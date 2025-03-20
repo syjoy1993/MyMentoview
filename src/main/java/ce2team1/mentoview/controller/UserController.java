@@ -3,6 +3,7 @@ package ce2team1.mentoview.controller;
 
 import ce2team1.mentoview.controller.dto.request.UserCreateForm;
 import ce2team1.mentoview.controller.dto.request.UserMypage;
+import ce2team1.mentoview.controller.dto.request.UserPasswordCreate;
 import ce2team1.mentoview.controller.dto.request.UserPasswordModify;
 import ce2team1.mentoview.controller.dto.response.FormUserResp;
 import ce2team1.mentoview.controller.dto.response.UserResp;
@@ -56,7 +57,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "인증 없음")
     })
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/signup/api/mypage")
+    @PostMapping("/mypage")
     public ResponseEntity<UserResp> mypage (@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails,
                                             @Valid @RequestBody UserMypage userMypage) {
         Long userId = mvPrincipalDetails.getUserId();
@@ -77,7 +78,6 @@ public class UserController {
     @PostMapping("/mypage/password")
     public ResponseEntity<String> modifyPassword(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails, @Valid @RequestBody UserPasswordModify userPasswordModify) {
         Long userId = mvPrincipalDetails.getUserId();
-
         if (!userPasswordModify.getAfterPassword().equals(userPasswordModify.getAfterPasswordCheck())) {
             throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
@@ -97,6 +97,23 @@ public class UserController {
         }
 
         return ResponseEntity.ok("삭제완료");
+    }
+
+    @Operation(summary = "social 비밀번호 생성", description = "social 사용자의 비밀번호를 생성합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "social 비밀번호 생성"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    })
+    @PostMapping("/social/password")
+    public ResponseEntity<String> createPassword(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails, @Valid @RequestBody UserPasswordCreate userPasswordCreate) {
+        Long userId = mvPrincipalDetails.getUserId();
+        if (!userPasswordCreate.getPassword().equals(userPasswordCreate.getPasswordCheck())) {
+            throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+        userService.createPassword(userId, userPasswordCreate.getPassword());
+
+        return ResponseEntity.ok("비밀번호 변경 성공");
+
     }
 
 

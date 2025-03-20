@@ -60,7 +60,6 @@ public class SubscriptionService {
     }
 
     public SubscriptionDto createSubscription(PaymentCheckDto paymentCheckDto) {
-
         // paidAt 포맷팅
         String paidAtString = paymentCheckDto.getPaidAt();
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME).withZoneSameInstant(ZoneId.of("Asia/Seoul"));;
@@ -83,10 +82,27 @@ public class SubscriptionService {
                                                                 ));
     }
 
+    public void createFreeTireSubscription(Long uId) {
+
+        LocalDate ld = LocalDate.now();
+        User user = userRepository.findById(uId).orElseThrow();
+
+        subscriptionRepository.save(Subscription.of(
+                SubscriptionStatus.ACTIVE,
+                SubscriptionPlan.FREE_TIRE,
+                ld,
+                ld.plusDays(30),
+                ld.plusDays(31),
+                PaymentMethod.KAKAO_PAY,
+                null,
+                null,
+                user)
+        );
+    }
+
     public Long checkSubscription(Long uId) {
 
         Subscription subscription = subscriptionRepository.findByUser_UserIdAndStatus(uId, SubscriptionStatus.ACTIVE);
-        System.out.println(subscription);
 
         if (subscription != null) {
             return subscription.getSubId();
@@ -98,7 +114,7 @@ public class SubscriptionService {
     public SubscriptionDto modifyEndDateAndNextBillingDate(Long subId, String paidAt) {
 
         Subscription subscription = subscriptionRepository.findById(subId).orElseThrow();
-        subscription.modifyEndDateAndNextBillingDate(paidAt);
+        subscription.modifyEndDateAndNextBillingDateAndPlan(paidAt);
 
         return SubscriptionDto.toDto(subscription);
     }

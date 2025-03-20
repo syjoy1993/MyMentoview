@@ -31,4 +31,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
   @Query("delete from RefreshToken r where r.maxExpirationDate < :now")
   int deleteMaxExpirationDate(@Param("now") LocalDateTime now);
 
+  @Modifying
+  @Query("delete from RefreshToken r where r.userEmail = :email")
+  void deleteByUserEmail(String email);
+
 }

@@ -41,7 +41,7 @@ public class UserDto {
         return UserDto.builder()
                 .userId(userId)
                 .email(email)
-                .password(null)
+                .password("")
                 .role(role)
                 .build();
     }
@@ -68,6 +68,7 @@ public class UserDto {
         return UserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
+                .password(user.getPassword() != null ? user.getPassword() : "")
                 .name(user.getName())
                 .role(user.getRole())
                 .socialProvider(user.getSocialProvider())
@@ -79,7 +80,7 @@ public class UserDto {
         return UserDto.builder()
                 .userId(user.getUserId())
                 .email(user.getEmail())
-                .password(user.getPassword())
+                .password(user.getPassword() != null ? user.getPassword() : "")
                 .name(user.getName())
                 .role(user.getRole())
                 .socialProvider(user.getSocialProvider())

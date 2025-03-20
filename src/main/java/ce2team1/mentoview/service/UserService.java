@@ -22,7 +22,7 @@ public class UserService {
     private final SubscriptionRepository subscriptionRepository;
     private final PasswordEncoder passwordEncoder;
 
-
+    @Transactional(readOnly = false)
     public UserDto createUser(UserDto userDto) {
 
         Optional<User> findByEmail = userRepository.findByEmail(userDto.getEmail());
@@ -59,7 +59,7 @@ public class UserService {
 
     }
 
-
+    @Transactional(readOnly = false)
     public void changePassword(Long userId, String beforePassword, String afterPassword) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
@@ -112,5 +112,17 @@ public class UserService {
 
         System.out.println("유저 id - " + user.getUserId());
         return UserDto.toDto(user);
+    }
+
+    @Transactional(readOnly = false)
+    public void createPassword(Long userId, String password) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
+        //UserDto userDto = UserDto.toDto(user);
+
+        UserDto newUserDto = UserDto.toDto(user).toBuilder()
+                .password(passwordEncoder.encode(password))
+                .build();
+        userRepository.save(User.toEntity(newUserDto));
+
     }
 }

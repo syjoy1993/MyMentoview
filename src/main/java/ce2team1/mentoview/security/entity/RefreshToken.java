@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
-    public static final long MAX_EXPIRATION_DAYS = 14;
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
@@ -24,20 +23,22 @@ public class RefreshToken {
     @Column(nullable = false)
     private LocalDateTime maxExpirationDate;
 
-    public static RefreshToken of(String email, String refreshToken, LocalDateTime expirationDate) {
+    public static final long MAX_EXPIRATION_DAYS = 14;
+
+    public static RefreshToken of(String userEmail, String refreshToken, LocalDateTime expirationDate) {
         return new RefreshToken(
                 null,
-                email,
+                userEmail,
                 refreshToken,
                 expirationDate,
                 expirationDate.plusDays(MAX_EXPIRATION_DAYS)
         );
     }
 
-    public static RefreshToken of(Long id, String email, String refreshToken, LocalDateTime expirationDate) {
+    public static RefreshToken of(Long id, String userEmail, String refreshToken, LocalDateTime expirationDate) {
         return new RefreshToken(
                 id,
-                email,
+                userEmail,
                 refreshToken,
                 expirationDate,
                 expirationDate.plusDays(MAX_EXPIRATION_DAYS)

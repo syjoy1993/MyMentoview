@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,10 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.context.*;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -41,6 +39,8 @@ public class SecurityConfig {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final MvRequestFilter mvRequestFilter;
+    private final MvLogoutHandler  mvLogoutHandler;
+    private final LambdaRequestFilter lambdaFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final WebhookFilter webhookFilter;
 
@@ -48,7 +48,7 @@ public class SecurityConfig {
     @Bean
     public SecurityContextRepository securityContextRepository() {
         return new DelegatingSecurityContextRepository(
-                new HttpSessionSecurityContextRepository(),
+                new RequestAttributeSecurityContextRepository(),
                 new HttpSessionSecurityContextRepository());
     }
 
@@ -92,7 +92,24 @@ public class SecurityConfig {
                 .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**", "/api/swagger-resources/**") //swagger
                 .requestMatchers("/", "/favicon.ico", "/static", "/about", "/contactus")
                 .requestMatchers("/error", "/error/**");
+    }
 
+    @Bean
+    public SecurityFilterChain monitoringSecurityFilterChain(HttpSecurity security) throws Exception {
+        configureCommon(security);
+        security.securityMatcher("/api/management/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/management/health",
+                                "/api/management/info",
+                                "/api/management/prometheus"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 비세션 방식 유지
+                .httpBasic(Customizer.withDefaults());
+        return security.build();
     }
 
     @Bean
@@ -133,34 +150,28 @@ public class SecurityConfig {
         //security.addFilterAfter(mvRequestFilter, SecurityContextHolderFilter.class);
 
         return security.build();
-
     }
-
     @Bean
     public SecurityFilterChain commonSecurityFilterChain(HttpSecurity security) throws Exception {
         configureCommon(security);
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
+                        .requestMatchers("/api/interview/response/transcription").permitAll()
                         .requestMatchers("/api/signup/**").permitAll()
                         .requestMatchers("/api/webhook/**").permitAll()
-                        .requestMatchers("/api/**").hasRole("USER")
-                        .requestMatchers("/api/auth/me").hasRole("USER")
-                        .requestMatchers("/admin/**").hasRole("ADMIN"));
+                        .requestMatchers("/api/auth/me").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/api/token/access").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/error").permitAll());
 
+        security.addFilterBefore(lambdaFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(webhookFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(mvRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return security.build();
-    }
-
-    @Bean
-    @Order(0) // 우선순위를 최상위로 지정
-    public SecurityFilterChain lambdaSecurityFilterChain(HttpSecurity security) throws Exception {
-        security
-                .securityMatcher("/api/interview/response/transcription")
-                .addFilterBefore(new LambdaRequestFilter("/api/interview/response/transcription"), UsernamePasswordAuthenticationFilter.class)
-                // 검증 후, 추가 필터 없이 통과시키기 위해 permitAll 설정
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-
+        security.logout(logout -> logout
+                .addLogoutHandler(mvLogoutHandler)
+                //.logoutRequestMatcher(new AntPathRequestMatcher("/api/logout", "GET")) // fe에서 get으로 올경
+                .logoutUrl("/api/logout"));
         return security.build();
     }
 
