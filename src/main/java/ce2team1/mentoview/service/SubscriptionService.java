@@ -82,14 +82,14 @@ public class SubscriptionService {
                                                                 ));
     }
 
-    public void createFreeTireSubscription(Long uId) {
+    public void createFreeTierSubscription(Long uId) {
 
         LocalDate ld = LocalDate.now();
         User user = userRepository.findById(uId).orElseThrow();
 
         subscriptionRepository.save(Subscription.of(
                 SubscriptionStatus.ACTIVE,
-                SubscriptionPlan.FREE_TIRE,
+                SubscriptionPlan.FREE_TIER,
                 ld,
                 ld.plusDays(30),
                 ld.plusDays(31),
