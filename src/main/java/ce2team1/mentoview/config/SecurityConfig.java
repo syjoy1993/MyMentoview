@@ -90,7 +90,9 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 
-        return web -> web.ignoring().requestMatchers("/img/**")
+        return web -> web.ignoring()
+                .requestMatchers("/api/management/**","/api/targets","/api/config","/api/actuator","/api/actuator/**")
+                .requestMatchers("/img/**")
                 .requestMatchers("/api/management/**")
                 .requestMatchers("/api/test")
                 .requestMatchers("/api/swagger-ui/**", "/api/v3/api-docs/**", "/api/swagger-resources/**") //swagger
@@ -160,14 +162,13 @@ public class SecurityConfig {
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/api/interview/response/transcription").permitAll()
-                        .requestMatchers("/api/auth/me").hasAnyRole("USER","ADMIN")
-                        .requestMatchers("/api/token/access").authenticated()
-                        //.requestMatchers("/api/mypage/**").hasAnyRole("USER","ADMIN").authenticated()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/api/signup/**").permitAll()
                         .requestMatchers("/api/webhook/**").permitAll()
-                        .requestMatchers("/error").permitAll());
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/token/access").authenticated()
+                        .requestMatchers("/api/**").authenticated());
 
         security.addFilterBefore(lambdaFilter, UsernamePasswordAuthenticationFilter.class);
         security.addFilterBefore(webhookFilter, UsernamePasswordAuthenticationFilter.class);
@@ -176,7 +177,6 @@ public class SecurityConfig {
         security.addFilterBefore(deletedUserFilter, UsernamePasswordAuthenticationFilter.class);
         security.logout(logout -> logout
                 .addLogoutHandler(mvLogoutHandler)
-                //.logoutRequestMatcher(new AntPathRequestMatcher("/api/logout", "GET")) // fe에서 get으로 올경
                 .logoutUrl("/api/logout"));
         return security.build();
     }

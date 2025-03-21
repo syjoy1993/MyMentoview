@@ -9,6 +9,7 @@ import ce2team1.mentoview.controller.dto.response.FormUserResp;
 import ce2team1.mentoview.controller.dto.response.UserResp;
 import ce2team1.mentoview.exception.UserException;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import ce2team1.mentoview.service.ResumeService;
 import ce2team1.mentoview.service.SubscriptionService;
@@ -20,13 +21,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.header.Header;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api")
@@ -37,6 +42,7 @@ public class UserController {
     private final UserService userService;
     private final ResumeService resumeService;
     private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "Form 회원가입", description = "새로운 사용자를 등록합니다.")
     @ApiResponses(value = {
@@ -126,16 +132,33 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     @PostMapping("/social/password")
-    public ResponseEntity<String> createPassword(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails, @Valid @RequestBody UserPasswordCreate userPasswordCreate) {
+    public ResponseEntity<UserResp> createPassword(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails, @Valid @RequestBody UserPasswordCreate userPasswordCreate) {
         Long userId = mvPrincipalDetails.getUserId();
         if (!userPasswordCreate.getPassword().equals(userPasswordCreate.getPasswordCheck())) {
             throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
-        userService.createPassword(userId, userPasswordCreate.getPassword());
+        UserDto password = userService.createPassword(userId, userPasswordCreate.getPassword());
+        UserResp resp = UserResp.of(password, "비밀번호 변경 성공");
 
-        return ResponseEntity.ok("비밀번호 변경 성공");
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
 
     }
+
+
+    /*
+    *  String accessToken = jwtTokenProvider.createAccessToken(password.getEmail() , password.getRole());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("https://mentoview.site/"));
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .headers(headers).body(resp);
+
+    *
+    * */
+
+
 
 
 }

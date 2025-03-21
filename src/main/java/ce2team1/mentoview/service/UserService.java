@@ -97,14 +97,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = false)
-    public void createPassword(Long userId, String password) {
+    public UserDto createPassword(Long userId, String password) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found"));
         //UserDto userDto = UserDto.toDto(user);
 
         UserDto newUserDto = UserDto.toDto(user).toBuilder()
                 .password(passwordEncoder.encode(password))
                 .build();
-        userRepository.save(User.toEntity(newUserDto));
+        User saved = userRepository.save(User.toEntity(newUserDto));
+
+        return UserDto.toDto(saved);
 
     }
 
