@@ -71,7 +71,7 @@ public class SubscriptionService {
         PaymentMethod paymentMethod = "KAKAOPAY".equals(paymentCheckDto.getMethod().getProvider())? PaymentMethod.KAKAO_PAY : PaymentMethod.CREDIT_CARD;
         return SubscriptionDto.toDto(subscriptionRepository.save(Subscription.of(
                                                                     SubscriptionStatus.ACTIVE,
-                                                                    SubscriptionPlan.PREMIUM,
+                                                                    SubscriptionPlan.BASIC,
                                                                     ld,
                                                                     ld.plusDays(30),
                                                                     ld.plusDays(31),
