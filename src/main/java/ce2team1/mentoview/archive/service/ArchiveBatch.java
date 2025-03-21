@@ -6,7 +6,9 @@ import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +19,8 @@ public class ArchiveBatch {
 
     private final ArchiveService archiveService;
     private final UserRepository userRepository;
-
+    @Scheduled(cron = "0 0 2 * * ?")
+    @Transactional
     public void archiveDeletedUsers() {
         log.info("[유저 삭제 배치 시작] 탈퇴한 유저의 데이터를 아카이브");
 

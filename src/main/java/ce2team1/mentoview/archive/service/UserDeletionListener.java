@@ -9,7 +9,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
@@ -24,6 +29,8 @@ public class UserDeletionListener {
     private final SubscriptionRepository subscriptionRepository;
     private final EntityManager entityManager;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void deleteUserAfterArchiving(UserDeletedEvent event) {
         Long userId = event.getUserId();
         log.info("[유저 데이터 삭제 진행] UserId {} ", userId);
