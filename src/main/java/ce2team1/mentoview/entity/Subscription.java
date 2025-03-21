@@ -96,7 +96,7 @@ public class Subscription extends AuditingFields {
         this.endDate = localDate.plusDays(30);
         this.nextBillingDate = localDate.plusDays(31);
         if (this.plan == SubscriptionPlan.FREE_TIRE) {
-            this.plan = SubscriptionPlan.PREMIUM;
+            this.plan = SubscriptionPlan.BASIC;
         }
     }
 
