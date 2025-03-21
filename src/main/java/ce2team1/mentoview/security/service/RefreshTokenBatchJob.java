@@ -1,4 +1,4 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.service;
 
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.repository.RefreshTokenRepository;
@@ -43,6 +43,7 @@ public class RefreshTokenBatchJob {
         } catch (Exception e) {
             log.error("만료된 토큰 삭제 중 오류 발생 {}", e.getMessage(),e);
         }
+
     }
 
 

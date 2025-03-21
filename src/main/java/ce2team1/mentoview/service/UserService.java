@@ -116,9 +116,11 @@ public class UserService {
     @Transactional(readOnly = false)
     public void softDelete(Long userId) {
         UserDto userDto = UserDto.toDto(userRepository.findById(userId).orElseThrow(() -> new ServiceException("User not found")));
-        if(userDto.getBillingKey()!=null) {
+        UserDto updatedDto = userDto.toBuilder()
+                .billingKey(null)
+                .status(UserStatus.DELETED)
+                .build();
 
-        }
-
+        userRepository.save(User.toEntity(updatedDto));
     }
 }

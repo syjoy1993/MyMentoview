@@ -2,7 +2,7 @@ package ce2team1.mentoview.security.controller;
 
 import ce2team1.mentoview.controller.dto.response.UserResp;
 import ce2team1.mentoview.entity.atrribute.Role;
-import ce2team1.mentoview.security.JwtTokenProvider;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
