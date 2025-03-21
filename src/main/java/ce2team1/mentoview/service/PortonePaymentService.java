@@ -346,8 +346,10 @@ public class PortonePaymentService {
 
     public void processFreeTierSubscription(Long uId) throws JsonProcessingException {
         String billingKey = userService.getBillingKey(uId);
-        schedulePayment(uId, billingKey, null, LocalDate.now().plusDays(31).atStartOfDay(ZoneOffset.UTC).toString());
 
         subscriptionService.createFreeTierSubscription(uId);
+
+        schedulePayment(uId, billingKey, null, LocalDate.now().plusDays(31).atStartOfDay(ZoneOffset.UTC).toString());
+
     }
 }
