@@ -105,10 +105,7 @@ public class SecurityConfig {
                                 "/api/management/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
-                )
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 비세션 방식 유지
-                .httpBasic(Customizer.withDefaults());
+                );
         return security.build();
     }
 
