@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.math.BigDecimal;
@@ -175,7 +176,6 @@ public class PortonePaymentService {
             throw new RuntimeException("Invalid billingkey response");
         }
         else {
-            System.out.println(billingKeyCheckDto.getStatus());
             userService.setBillingKey(Long.valueOf(billingKeyCheckDto.getCustomer().getId()), billingKeyCheckDto.getBillingKey());
         }
     }
@@ -185,7 +185,6 @@ public class PortonePaymentService {
         // 포트원 서버로 빌링키 결제 요청
         User user = userRepository.findById(uId).orElseThrow();
         String billingKey = user.getBillingKey();
-        System.out.println(billingKey);
 
         // paymentId 생성
         String paymentId = "payment-" + UUID.randomUUID().toString();
@@ -343,5 +342,12 @@ public class PortonePaymentService {
         // 구독 상태 ACTIVE로 변경
         subscriptionService.modifySubscriptionStatusToActive(uId, SubscriptionStatus.CANCELED);
 
+    }
+
+    public void processFreeTireSubscription(Long uId) throws JsonProcessingException {
+        String billingKey = userService.getBillingKey(uId);
+        schedulePayment(uId, billingKey, null, LocalDate.now().plusDays(31).atStartOfDay(ZoneOffset.UTC).toString());
+
+        subscriptionService.createFreeTireSubscription(uId);
     }
 }
