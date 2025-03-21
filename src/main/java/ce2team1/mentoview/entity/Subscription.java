@@ -88,13 +88,16 @@ public class Subscription extends AuditingFields {
         this.status = subscriptionStatus;
     }
 
-    public void modifyEndDateAndNextBillingDate(String paidAt) {
+    public void modifyEndDateAndNextBillingDateAndPlan(String paidAt) {
 
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAt, DateTimeFormatter.ISO_DATE_TIME);
         LocalDate localDate = LocalDate.ofInstant(zonedDateTime.toInstant(), ZoneId.systemDefault());
 
         this.endDate = localDate.plusDays(30);
         this.nextBillingDate = localDate.plusDays(31);
+        if (this.plan == SubscriptionPlan.FREE_TIRE) {
+            this.plan = SubscriptionPlan.PREMIUM;
+        }
     }
 
     public void setPaymentIdAndScheduleId(String portonePaymentId, String portoneScheduleId) {

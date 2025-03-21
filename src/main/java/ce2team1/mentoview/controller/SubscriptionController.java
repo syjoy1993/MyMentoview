@@ -108,11 +108,16 @@ public class SubscriptionController {
         Long uId = mvPrincipalDetails.getUserId();
        // Long uId = 1L;
 
-        if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) == null) {
-            portonePaymentService.createPayment(uId);
-        } else {
+        if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) != null) {
             // 현재 CANCELED 상태의 구독의 nextBillingDate로 결제를 예약하고, 구독의 상태 ACTIVE로 변경
             portonePaymentService.processSubscriptionReactivation(uId);
+
+        } else if (subscriptionService.getSubscriptions(uId) != null){
+            // 이전 구독 내역이 존재 -> 바로 결제 진행
+            portonePaymentService.createPayment(uId);
+        } else {
+            // 첫 구독 -> free-tire로 구독 생성
+            portonePaymentService.processFreeTireSubscription(uId);
         }
         return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
 
