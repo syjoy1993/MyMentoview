@@ -111,17 +111,30 @@ public class SubscriptionController {
         if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) != null) {
             // 현재 CANCELED 상태의 구독의 nextBillingDate로 결제를 예약하고, 구독의 상태 ACTIVE로 변경
             portonePaymentService.processSubscriptionReactivation(uId);
-
-        } else if (subscriptionService.getSubscriptions(uId) != null){
-            List<SubscriptionResp> response = subscriptionService.getSubscriptions(uId);
-            System.out.println(response);
-            // 이전 구독 내역이 존재 -> 바로 결제 진행
-            portonePaymentService.createPayment(uId);
+          
         } else {
-            System.out.println("비어있음");
-            // 첫 구독 -> free-tire로 구독 생성
-            portonePaymentService.processFreeTireSubscription(uId);
+            // 바로 결제 진행
+            portonePaymentService.createPayment(uId);
+
         }
+        return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
+
+    }
+
+    @Operation(summary = "프리티어 구독 생성", description = "결제 없이 FREE-TIRE 구독을 생성합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프리티어 구독 요청 처리가 성공적으로 이루어졌습니다."),
+            @ApiResponse(responseCode = "500", description = "프리티어 구독 요청 처리 중 문제가 발생했습니다.")
+    })
+    @PostMapping("/subscription/freetire")
+    public ResponseEntity<String> createSubscriptionFreetire(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
+
+        Long uId = mvPrincipalDetails.getUserId();
+        // Long uId = 1L;
+
+        // 첫 구독 -> free-tire로 구독 생성
+        portonePaymentService.processFreeTireSubscription(uId);
+
         return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
 
     }
