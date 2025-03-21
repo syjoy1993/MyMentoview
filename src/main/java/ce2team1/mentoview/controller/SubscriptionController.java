@@ -113,9 +113,12 @@ public class SubscriptionController {
             portonePaymentService.processSubscriptionReactivation(uId);
 
         } else if (subscriptionService.getSubscriptions(uId) != null){
+            List<SubscriptionResp> response = subscriptionService.getSubscriptions(uId);
+            System.out.println(response);
             // 이전 구독 내역이 존재 -> 바로 결제 진행
             portonePaymentService.createPayment(uId);
         } else {
+            System.out.println("비어있음");
             // 첫 구독 -> free-tire로 구독 생성
             portonePaymentService.processFreeTireSubscription(uId);
         }
