@@ -1,4 +1,4 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

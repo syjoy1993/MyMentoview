@@ -111,10 +111,11 @@ public class SubscriptionController {
         if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) != null) {
             // 현재 CANCELED 상태의 구독의 nextBillingDate로 결제를 예약하고, 구독의 상태 ACTIVE로 변경
             portonePaymentService.processSubscriptionReactivation(uId);
-
+          
         } else {
-            // 이전 구독 내역이 존재 -> 바로 결제 진행
+            // 바로 결제 진행
             portonePaymentService.createPayment(uId);
+
         }
         return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
 

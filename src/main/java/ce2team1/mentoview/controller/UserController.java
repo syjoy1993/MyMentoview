@@ -9,6 +9,8 @@ import ce2team1.mentoview.controller.dto.response.FormUserResp;
 import ce2team1.mentoview.controller.dto.response.UserResp;
 import ce2team1.mentoview.exception.UserException;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.security.service.RefreshTokenService;
+import ce2team1.mentoview.service.ResumeService;
 import ce2team1.mentoview.service.SubscriptionService;
 import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
@@ -20,7 +22,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +35,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final SubscriptionService subscriptionService;
+    private final ResumeService resumeService;
+    private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "Form 회원가입", description = "새로운 사용자를 등록합니다.")
     @ApiResponses(value = {
@@ -85,16 +90,32 @@ public class UserController {
 
         return ResponseEntity.ok("비밀번호 변경 성공");
 
+
     }
 
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "탈퇴 성공"),
+            @ApiResponse(responseCode = "400", description = "권한 없음")
+    })
     @DeleteMapping("/mypage/delete/{id}")
     public ResponseEntity<String> userDelete(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails,
                                              @PathVariable Long id) {
 
         Long userId = mvPrincipalDetails.getUserId();
+
         if (!userId.equals(id)) {
             throw new UserException( "삭제할 권한이 없습니다.", HttpStatus.NOT_FOUND);
         }
+        userService.softDelete(userId);
+        resumeService.hardDeleteResume(userId);
+        refreshTokenService.deleteRefreshToken(mvPrincipalDetails.getName());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getName().equals(mvPrincipalDetails.getName())) {
+            SecurityContextHolder.clearContext(); // 강제 로그아웃
+        }
+
 
         return ResponseEntity.ok("삭제완료");
     }

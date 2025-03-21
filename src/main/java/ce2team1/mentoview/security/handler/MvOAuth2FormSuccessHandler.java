@@ -1,8 +1,9 @@
-package ce2team1.mentoview.security;
+package ce2team1.mentoview.security.handler;
 
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.security.dto.LoginType;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import ce2team1.mentoview.service.dto.UserDto;
 import jakarta.servlet.ServletException;
@@ -14,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;

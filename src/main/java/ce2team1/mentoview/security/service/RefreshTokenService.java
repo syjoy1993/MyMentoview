@@ -56,7 +56,6 @@ public class RefreshTokenService {
     @Transactional(readOnly = false)
     public void deleteRefreshToken(String email) {
         refreshTokenRepository.deleteByUserEmail(email);
-
     }
 
     public RefreshTokenDto findByEmail(String email) {
