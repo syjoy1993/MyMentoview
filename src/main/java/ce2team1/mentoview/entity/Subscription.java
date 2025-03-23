@@ -27,16 +27,22 @@ public class Subscription extends AuditingFields {
     @Column(name = "subscription_id")
     private Long subId;
 
+    @Column(nullable = false)
     @Convert(converter = SubscriptionStatusConverter.class)
     private SubscriptionStatus status;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SubscriptionPlan plan;
 
+    @Column(nullable = false)
     private LocalDate startDate;
+    @Column(nullable = false)
     private LocalDate endDate;
+    @Column(nullable = false)
     private LocalDate nextBillingDate;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
@@ -47,7 +53,7 @@ public class Subscription extends AuditingFields {
     private String portoneScheduleId; // 결제 예약 건 id : 결제 수단 변경 시 필요
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 //    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate,  PaymentMethod paymentMethod, String billingKey, String portonePaymentId, String portoneScheduleId, User user) {
