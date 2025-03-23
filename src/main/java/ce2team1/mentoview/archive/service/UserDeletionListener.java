@@ -1,5 +1,6 @@
 package ce2team1.mentoview.archive.service;
 
+import ce2team1.mentoview.admin.aop.annotation.TrackBatchMetric;
 import ce2team1.mentoview.entity.Interview;
 import ce2team1.mentoview.entity.Payment;
 import ce2team1.mentoview.entity.Resume;
@@ -29,6 +30,8 @@ public class UserDeletionListener {
     private final SubscriptionRepository subscriptionRepository;
     private final EntityManager entityManager;
 
+
+    @TrackBatchMetric("deleteUser")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void deleteUserAfterArchiving(UserDeletedEvent event) {

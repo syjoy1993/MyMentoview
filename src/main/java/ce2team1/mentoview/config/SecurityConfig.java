@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -105,8 +106,10 @@ public class SecurityConfig {
         configureCommon(security);
         security.securityMatcher("/api/admin/**")
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST,"api/admin/batch/**").permitAll()
                         .requestMatchers("/api/admin/login").permitAll() // 관리자가 로그인할 수 있도록 허용
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // ✅ 관리자만 접근 가능
+                        //.requestMatchers("/api/admin/**").hasRole("ADMIN") // ✅ 관리자만 접근 가능
+                        //.requestMatchers(HttpMethod.POST,"api/admin/batch/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
         return security.build();

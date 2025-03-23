@@ -1,5 +1,6 @@
 package ce2team1.mentoview.archive.service;
 
+import ce2team1.mentoview.admin.aop.annotation.TrackBatchMetric;
 import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.repository.UserRepository;
@@ -19,8 +20,10 @@ public class ArchiveBatch {
 
     private final ArchiveService archiveService;
     private final UserRepository userRepository;
+
     @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
+    @TrackBatchMetric("userArchive")
     public void archiveDeletedUsers() {
         log.info("[유저 삭제 배치 시작] 탈퇴한 유저의 데이터를 아카이브");
 
@@ -52,3 +55,5 @@ public class ArchiveBatch {
 
 
 }
+
+

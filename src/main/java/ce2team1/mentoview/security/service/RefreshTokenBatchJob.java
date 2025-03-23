@@ -1,5 +1,6 @@
 package ce2team1.mentoview.security.service;
 
+import ce2team1.mentoview.admin.aop.annotation.TrackBatchMetric;
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.repository.RefreshTokenRepository;
 import ce2team1.mentoview.security.entity.RefreshToken;
@@ -29,6 +30,7 @@ public class RefreshTokenBatchJob {
     //만료토큰삭제
     @Scheduled(cron = "0 0 0 * * ?") // 매일 00시 : 초,분,시,일,월,요일
     @Transactional
+    @TrackBatchMetric("refreshTokenExpiredCleanup")
     public void deleteExpiredTokens() {
         log.info("Deleting expired tokens");
         try {
@@ -48,6 +50,7 @@ public class RefreshTokenBatchJob {
 
 
     @TransactionalEventListener
+    @TrackBatchMetric("refreshTokenUpdate")
     public void rotateRefreshToken(RefreshTokenDeletedEvent deletedEvent) {
         log.info("만료 토큰 삭제 완료 ==> Start Rotating refresh token!!");
 
