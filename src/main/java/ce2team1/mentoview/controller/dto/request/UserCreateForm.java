@@ -1,6 +1,7 @@
 package ce2team1.mentoview.controller.dto.request;
 
-
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
