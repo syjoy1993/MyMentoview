@@ -1,9 +1,8 @@
 package ce2team1.mentoview.controller.dto.request;
 
-
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +19,7 @@ public class UserCreateForm {
 
     @NotBlank
     private String email;
+
     @NotBlank(message = "비밀번호를 입력해주세요")
     @Size(min = 8, max =15, message = "비밀번호 최소 8자 이상, 최대 15자 이하로 입력해주세요")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\\\d)(?=.*[.@$!%*?&\\\\^~+=()\\\\[\\\\]#-])[A-Za-z\\\\d.@$!%*?&\\\\^~+=()\\\\[\\\\]#-]{8,15}$",
