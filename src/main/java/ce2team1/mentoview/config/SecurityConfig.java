@@ -162,7 +162,7 @@ public class SecurityConfig {
         security.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
                         .requestMatchers("/api/interview/response/transcription").permitAll()
-                        .requestMatchers("/api/signup/**").permitAll()
+                        .requestMatchers("/api/signup/form").permitAll()
                         .requestMatchers("/api/webhook/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

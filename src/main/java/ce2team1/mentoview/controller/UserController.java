@@ -122,7 +122,6 @@ public class UserController {
             SecurityContextHolder.clearContext(); // 강제 로그아웃
         }
 
-
         return ResponseEntity.ok("삭제완료");
     }
 
