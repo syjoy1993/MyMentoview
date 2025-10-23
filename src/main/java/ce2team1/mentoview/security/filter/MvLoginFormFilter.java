@@ -33,11 +33,11 @@ public class MvLoginFormFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         ContentCachingRequestWrapper cachingRequest = new ContentCachingRequestWrapper(request);
-
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -52,13 +52,13 @@ public class MvLoginFormFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     private UserFormLogin getUserFormLogin(HttpServletRequest request, ObjectMapper objectMapper) {
+        //AnonymousAuthenticationToken도 isAuthenticated()가 true 가능
         if (SecurityContextHolder.getContext().getAuthentication() != null && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-
             throw new AuthenticationServiceException("이미 로그인된 사용자 입니다!");
         }
 
         String contentType = request.getContentType();
-        if (!contentType.equals("application/json") || !contentType.toLowerCase().startsWith("application/json")) {
+        if (contentType == null || !contentType.toLowerCase().startsWith("application/json")) {
 
             throw new AuthenticationServiceException("유효하지않는 content type: " + contentType);
         }
@@ -66,19 +66,17 @@ public class MvLoginFormFilter extends AbstractAuthenticationProcessingFilter {
         try {
             String requestBody = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
-
             if (requestBody.isEmpty()) {
-
                 throw new AuthenticationServiceException("요청 본문이 비어 있습니다.");
             }
 
             // JSON을 객체로 변환
             return objectMapper.readValue(requestBody, UserFormLogin.class);
         } catch (IOException e) {
-
             throw new AuthenticationServiceException("로그인 요청을 처리할 수 없습니다.");
         }
 
     }
+    //private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 
 }
