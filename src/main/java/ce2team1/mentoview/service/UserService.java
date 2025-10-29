@@ -1,5 +1,6 @@
 package ce2team1.mentoview.service;
 
+import ce2team1.mentoview.archive.service.UserDeletedEvent;
 import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
@@ -8,6 +9,7 @@ import ce2team1.mentoview.repository.SubscriptionRepository;
 import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.service.dto.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional(readOnly = false)
     public UserDto createUser(UserDto userDto) {
@@ -124,5 +127,7 @@ public class UserService {
                 .build();
 
         userRepository.save(User.toEntity(updatedDto));
+
+        publisher.publishEvent(new UserDeletedEvent(userId));
     }
 }
