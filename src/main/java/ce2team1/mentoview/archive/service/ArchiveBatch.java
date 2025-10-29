@@ -3,7 +3,6 @@ package ce2team1.mentoview.archive.service;
 import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
 import ce2team1.mentoview.repository.UserRepository;
-import ce2team1.mentoview.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +24,7 @@ public class ArchiveBatch {
         log.info("[유저 삭제 배치 시작] 탈퇴한 유저의 데이터를 아카이브");
 
         List<User> deletingUsers = userRepository.findAllByStatus(UserStatus.DELETED);
-        if (!deletingUsers.isEmpty()) {
+        if (deletingUsers.isEmpty()) {
             log.info("[유저 삭제 배치 완료!] 탈퇴 유저 없음");
             return;
         }
