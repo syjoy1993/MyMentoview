@@ -17,11 +17,11 @@ public class InterviewArchive  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
+    //복합 UNIQUE: user_id, interview_key
+    @Column(name="user_id", nullable=false)
     private Long userId;
 
-    @Column(length = 255, nullable = false)
+    @Column(name="interview_key", nullable=false, length=512)
     private String interviewKey; // S3 키 값
 
     @Column(nullable = false)

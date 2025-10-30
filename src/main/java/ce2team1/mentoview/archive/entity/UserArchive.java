@@ -21,7 +21,7 @@ public class UserArchive  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    //UNIQUE: user_id,email
     @Column(unique = true, nullable = false)
     private Long userId; // 기존식별자
 
