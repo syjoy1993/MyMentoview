@@ -9,7 +9,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,28 +118,28 @@ public class UserDeletionListener {
     }
 
     private void deletePaymentsInBatch(List<Long> paymentIds) {
-        Query query = entityManager.createQuery("delete from Payment p where p.id in :paymentIds");
+        Query query = entityManager.createQuery("delete from Payment p where p.paymentId in :paymentIds");
         query.setParameter("paymentIds", paymentIds);
         query.executeUpdate();
         entityManager.clear();
     }
 
     private void deleteSubscriptionsInBatch(List<Long> subIds) {
-        Query query = entityManager.createQuery("delete from Subscription s where s.id in :subIds");
+        Query query = entityManager.createQuery("delete from Subscription s where s.subId in :subIds");
         query.setParameter("subIds", subIds);
         query.executeUpdate();
         entityManager.clear();
     }
 
     private void deleteInterviewsInBatch(List<Long> interviewIds) {
-        Query query = entityManager.createQuery("delete from Interview i where i.id in :interviewIds");
+        Query query = entityManager.createQuery("delete from Interview i where i.interviewId in :interviewIds");
         query.setParameter("interviewIds", interviewIds);
         query.executeUpdate();
         entityManager.clear();
     }
 
     private void deleteResumesInBatch(List<Long> resumeIds) {
-        Query query = entityManager.createQuery("delete from Resume r where r.id in :resumeIds");
+        Query query = entityManager.createQuery("delete from Resume r where r.resumeId in :resumeIds");
         query.setParameter("resumeIds", resumeIds);
         query.executeUpdate();
         entityManager.clear();

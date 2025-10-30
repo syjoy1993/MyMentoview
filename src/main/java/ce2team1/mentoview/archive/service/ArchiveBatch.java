@@ -18,6 +18,7 @@ public class ArchiveBatch {
 
     private final ArchiveService archiveService;
     private final UserRepository userRepository;
+
     @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void archiveDeletedUsers() {

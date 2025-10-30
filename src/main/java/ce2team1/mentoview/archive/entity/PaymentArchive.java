@@ -17,11 +17,14 @@ public class PaymentArchive {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //복합 UNIQUE: user_id, approval_code
+    @Column(name="user_id", nullable=false)
     private Long userId;
 
-    private BigDecimal amount;
-
+    @Column(name="approval_code", nullable=false, length=128)
     private String approvalCode; // 승인번호
+
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
