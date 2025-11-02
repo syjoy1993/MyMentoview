@@ -23,4 +23,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Modifying
     @Query("delete from Payment p")
     int deleteFirstBy();
+
+    long countByUserId(Long userId);
 }

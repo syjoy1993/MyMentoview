@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InterviewArchiveRepository extends JpaRepository<InterviewArchive, Long> {
 
+    long countByUserId(Long userId);
 }

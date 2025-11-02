@@ -1,6 +1,5 @@
 package ce2team1.mentoview.service;
 
-import ce2team1.mentoview.archive.service.UserDeletedEvent;
 import ce2team1.mentoview.entity.User;
 import ce2team1.mentoview.entity.atrribute.Role;
 import ce2team1.mentoview.entity.atrribute.UserStatus;
@@ -128,6 +127,5 @@ public class UserService {
 
         userRepository.save(User.toEntity(updatedDto));
 
-        publisher.publishEvent(new UserDeletedEvent(userId));
     }
 }

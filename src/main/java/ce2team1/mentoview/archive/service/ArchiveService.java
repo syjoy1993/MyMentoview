@@ -2,7 +2,9 @@ package ce2team1.mentoview.archive.service;
 
 import ce2team1.mentoview.archive.dto.InterviewData;
 import ce2team1.mentoview.archive.dto.InterviewEntry;
-import ce2team1.mentoview.archive.entity.*;
+import ce2team1.mentoview.archive.entity.InterviewArchive;
+import ce2team1.mentoview.archive.entity.PaymentArchive;
+import ce2team1.mentoview.archive.entity.UserArchive;
 import ce2team1.mentoview.archive.repository.InterviewArchiveRepository;
 import ce2team1.mentoview.archive.repository.PaymentArchiveRepository;
 import ce2team1.mentoview.archive.repository.UserArchiveRepository;
@@ -21,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -124,7 +125,40 @@ public class ArchiveService {
         userArchiveRepository.save(userArchive);
         log.info("archive userId = " + userId);
 
+    }
+
+    @Transactional(readOnly = false)
+    public void checkingArcheived(Long userId) {
+        //  Interview
+        long dbInterviewCnt = interviewRepository.countByUserId(userId);
+        long archivedInterviewCnt = archiveRepository.countByUserId(userId);
+        if (dbInterviewCnt > 0 && archivedInterviewCnt < dbInterviewCnt) {
+            log.warn("[checkingArchived] interview incomplete: {}/{} userId={}",
+                    archivedInterviewCnt, dbInterviewCnt, userId);
+            return; // 다음 배치 주기에 재시도
+        }
+
+        // Payment
+        long srcPaymentCnt = paymentRepository.countByUserId(userId); // (구독 기준이면 findBySubIds로 변형)
+        long archivedPaymentCnt = paymentArchiveRepository.countByUserId(userId);
+        if (srcPaymentCnt > 0 && archivedPaymentCnt < srcPaymentCnt) {
+            log.warn("[checkingArchived] payment incomplete: {}/{} userId={}",
+                    archivedPaymentCnt, srcPaymentCnt, userId);
+            return;
+        }
+
+        boolean hasUserArchive = userArchiveRepository.existsByUserId(userId);
+        if (!hasUserArchive) {
+            log.warn("[checkingArchived] userArchive missing. userId={}", userId);
+            return;
+        }
+
+        // s3 검증?
+
+        if (userArchiveRepository.alreadyPublished(userId)) return;
+
         eventPublisher.publishEvent(new UserDeletedEvent(userId));
+        log.info("[checkingArchived] All archived. Published UserDeletedEvent. userId={}", userId);
 
     }
 

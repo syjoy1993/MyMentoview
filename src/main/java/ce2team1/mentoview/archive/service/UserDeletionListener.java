@@ -33,6 +33,11 @@ public class UserDeletionListener {
     public void deleteUserAfterArchiving(UserDeletedEvent event) {
         Long userId = event.getUserId();
         log.info("[유저 데이터 삭제 진행] UserId {} ", userId);
+        // 멱등
+        if(!userRepository.existsById(userId)) {
+            log.info("[onUserDeleted] already  removes. userId={}", userId);
+            return;
+        }
 
         List<Long> resumeIds = resumeRepository.findAllByUserId(userId)
                 .stream().map(Resume::getResumeId).toList();

@@ -47,6 +47,9 @@ public class ArchiveBatch {
 
             log.info("[아카이브 배치 완료] 모든 유저 데이터 아카이브 작업 완료 ");
 
+            // 완료 검증 + 발행
+            archiveService.checkingArcheived(userId);
+
         }
     }
 
