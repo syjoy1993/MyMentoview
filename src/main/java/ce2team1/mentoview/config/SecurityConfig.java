@@ -28,7 +28,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.*;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -167,7 +170,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/me").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/token/access").authenticated()
+                        .requestMatchers("/api/token/access").permitAll()
                         .requestMatchers("/api/**").authenticated());
 
         security.addFilterBefore(lambdaFilter, UsernamePasswordAuthenticationFilter.class);

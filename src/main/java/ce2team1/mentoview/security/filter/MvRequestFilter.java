@@ -1,7 +1,7 @@
 package ce2team1.mentoview.security.filter;
 
-import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
+import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
 import jakarta.servlet.FilterChain;
@@ -27,12 +27,13 @@ public class MvRequestFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-/*    @Override
+    @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        return path.startsWith("/api/oauth2/authorization") || path.startsWith("/api/login/oauth2/code");
-    }*/
-
+        String path = request.getServletPath();
+        return path.equals("/api/token/access")
+                || path.startsWith("/api/oauth2/authorization")
+                || path.startsWith("/api/login/oauth2/code");
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -47,19 +48,10 @@ public class MvRequestFilter extends OncePerRequestFilter {
         String authToken = bearerToken.substring(7).trim();
 
         if (jwtTokenProvider.isExpired(authToken)) {
-            String emailFromToken = jwtTokenProvider.getEmailFromToken(authToken);
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            PrintWriter writer = response.getWriter();
-            writer.write("{\"error\":\"Expired JWT token\"}");
-            writer.flush();
+            // 만료시 filter 401X -> 컨트롤러로 인가 레이어 넘김
+            filterChain.doFilter(request, response);
             return;
-
         }
-        // 토큰 이름 찾아
 
         // 토큰 타입으로 찾아
         String type = jwtTokenProvider.getType(authToken);
