@@ -40,11 +40,19 @@ public class TokenController {
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
 
         String authHeader = request.getHeader("Authorization"); //토큰
-        String token = authHeader.substring(7);
+        // authHeader 헤더 방어
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>("token not found", HttpStatus.UNAUTHORIZED);
+        }
+        String token = authHeader.substring(0,7);
 
+        if(jwtTokenProvider.isExpired(token)){
+            return new ResponseEntity<>("token expired", HttpStatus.UNAUTHORIZED);
+        }
         String emailFromToken = jwtTokenProvider.getEmailFromToken(token);//email
 
         String refreshToken = refreshTokenService.getRefreshToken(emailFromToken); // refresh
+
 
         if (refreshToken == null) {
             return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);

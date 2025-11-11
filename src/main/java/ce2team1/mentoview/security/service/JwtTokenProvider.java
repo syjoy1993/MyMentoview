@@ -85,12 +85,15 @@ public class JwtTokenProvider {
     }
 
 
-    public Boolean isExpired(String token) { // 만료
+    public Boolean isExpired(String token) {
         try {
-            return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
-                    .getExpiration().before(new Date());
+            // 만료됨? | true -> 만료, false -> 유효
+            Date expiration = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                    .getExpiration();
+            return expiration.before(new Date());
+            // getExpiration().before(new Date()) : “만료 시각” vs “현재 시각”
         } catch (Exception e) {
-            return true;
+            return true; //토큰이 유효하지 않은 경우 만료된 것으로 간주
         }
     }
 
@@ -115,16 +118,5 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 토큰 생성!
-/*    private  String createTemp(String type , String email, Role role, Long expiration, UserStatus status) {
-        return Jwts.builder()
-                .claim("type", type)
-                .claim("email", email)
-                .claim("role", role.getCode())
-                .claim("status", status.name())
-                .issuedAt(new Date(System.currentTimeMillis())) //시간
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(secretKey)
-                .compact();
-    }*/
+
 }
