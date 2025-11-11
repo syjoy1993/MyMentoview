@@ -50,7 +50,6 @@ public class RefreshTokenBatchJob {
     @TransactionalEventListener
     public void rotateRefreshToken(RefreshTokenDeletedEvent deletedEvent) {
         log.info("만료 토큰 삭제 완료 ==> Start Rotating refresh token!!");
-
         List<RefreshToken> expiringRefreshTokens = refreshTokenRepository.findExpiringRefreshTokens(LocalDateTime.now().minusMinutes(1));
         int totalExpiring = expiringRefreshTokens.size();
         int updatedTokens = 0;
