@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface OAuth2ResponseSocial {
     SocialProvider getProvider();
-    String getProviderId();
+    String getProviderId(); // 사용자 유일 식별자 최대 255
     String getEmail();
     String getName();
     boolean isEmailVerified();

@@ -1,6 +1,6 @@
 package ce2team1.mentoview.service.dto;
 
-import ce2team1.mentoview.entity.atrribute.PaymentStatus;
+import ce2team1.mentoview.payment.infra.portone.dto.PortoneBillingKey;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -29,18 +29,23 @@ public class BillingKeyDto {
         return new BillingKeyDto(id, billingKey, status, pgProvider, issuedDate, chosen, uId);
     }
 
-    public static BillingKeyDto checkToDto(BillingKeyCheckDto billingKeyCheckDto) {
+    public static BillingKeyDto fromPortone(PortoneBillingKey portoneBillingKey) {
 
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(billingKeyCheckDto.getIssuedAt(), DateTimeFormatter.ISO_DATE_TIME);
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(portoneBillingKey.getIssuedAt(), DateTimeFormatter.ISO_DATE_TIME);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.systemDefault());
 
+        String pgProvider = "UNKNOWN";
+        if (portoneBillingKey.getChannels() != null && !portoneBillingKey.getChannels().isEmpty()) {
+            pgProvider = portoneBillingKey.getChannels().get(0).getPgProvider();
+        }
+
         return BillingKeyDto.of(
-                billingKeyCheckDto.getBillingKey(),
-                billingKeyCheckDto.getStatus(),
-                billingKeyCheckDto.getChannels().get(0).getPgProvider(),
+                portoneBillingKey.getBillingKey(),
+                portoneBillingKey.getStatus(),
+                portoneBillingKey.getChannels().get(0).getPgProvider(),
                 localDateTime,
                 true,
-                Long.valueOf(billingKeyCheckDto.getCustomer().getId()));
+                Long.valueOf(portoneBillingKey.getCustomer().getId()));
     }
 
 }

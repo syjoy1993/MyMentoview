@@ -2,6 +2,7 @@ package ce2team1.mentoview.entity;
 
 
 import ce2team1.mentoview.entity.atrribute.PaymentStatus;
+import ce2team1.mentoview.service.dto.PortonePayment;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -24,10 +25,17 @@ public class Payment {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(nullable = false)
-    private String approvalCode;
+    @Column(name = "pg_approval_code", nullable = false)
+    private String pgApprovalCode; //pg_tid
 
-    @Column(nullable = false)
+    @Column(name= "transaction_id", unique = true,nullable = false)
+    private String transactionId; //Portone의 paymentId, imp_uid
+
+    @Column(name= "merchant_uid",nullable = false)
+    private String merchantUid;// 우리가 만든 주문번호 (paymentId)
+
+
+    @Column(nullable = false, columnDefinition = "varchar(20)")
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -38,14 +46,55 @@ public class Payment {
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 
-    public static Payment of(BigDecimal amount, String approvalCode,PaymentStatus status, LocalDateTime paymentDate, Subscription subscription) {
-        return new Payment (null, amount, approvalCode, status, paymentDate, subscription);
-
+    public static Payment of(BigDecimal amount, String pgApprovalCode, PaymentStatus status,
+                             LocalDateTime paymentDate, Subscription subscription,
+                             String transactionId, String merchantUid) {
+        return Payment.builder()
+                .amount(amount)
+                .pgApprovalCode(pgApprovalCode)
+                .status(status)
+                .paymentDate(paymentDate)
+                .subscription(subscription)
+                .transactionId(transactionId)
+                .merchantUid(merchantUid)
+                .build();
     }
-    public static Payment of(Long paymentId, BigDecimal amount, String approvalCode, PaymentStatus status, LocalDateTime paymentDate, Subscription subscription) {
-        return new Payment (paymentId, amount, approvalCode,status, paymentDate,subscription );
-
+    public static Payment of(Long paymentId,BigDecimal amount, String pgApprovalCode, PaymentStatus status,
+                             LocalDateTime paymentDate, Subscription subscription,
+                             String transactionId, String merchantUid) {
+        return Payment.builder()
+                .paymentId(paymentId)
+                .amount(amount)
+                .pgApprovalCode(pgApprovalCode)
+                .status(status)
+                .paymentDate(paymentDate)
+                .subscription(subscription)
+                .transactionId(transactionId)
+                .merchantUid(merchantUid)
+                .build();
     }
+    public static Payment toPayment(PortonePayment dto, Subscription subscription) {
+        return Payment.builder()
+                .amount(dto.getAmount().getTotal())
+                .pgApprovalCode(dto.getTransactionId() != null ? dto.getTransactionId() : dto.getId())
+                .status(PaymentStatus.SUCCESS)
+                .paymentDate(LocalDateTime.now()) // 실제로는 dto.getPaidAt() 파싱 권장
+                .subscription(subscription)
+                .transactionId(dto.getId())       // 포트원 ID
+                .merchantUid(dto.getMerchantId()) // 주문번호
+                .build();
+    }
+
+    /*
+    * todo 완료
+    *   - private String  portone_transaction_id ->transactionId
+    *   - private String  order_id_portone_ob -> merchantUid
+    *   - private String pg_tid -> pgApprovalCode
+    *   - status
+    *       - @Enumerated(EnumType.STRING) hibernate6.xx && MySQL정책 변경 반영
+    *       => @Column(nullable = false, columnDefinition = "varchar(20)") 추가
+    */
+
 
 
     @Override
