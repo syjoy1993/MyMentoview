@@ -12,7 +12,6 @@ import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import ce2team1.mentoview.service.ResumeService;
-import ce2team1.mentoview.service.SubscriptionService;
 import ce2team1.mentoview.service.UserService;
 import ce2team1.mentoview.service.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,17 +20,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.header.Header;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/api")

@@ -21,8 +21,8 @@ public class PaymentArchive {
     @Column(name="user_id", nullable=false)
     private Long userId;
 
-    @Column(name="approval_code", nullable=false, length=128)
-    private String approvalCode; // 승인번호
+    @Column(name="pg_approval_code", nullable=false, length=128)
+    private String pgApprovalCode; // 승인번호
 
     private BigDecimal amount;
 
@@ -37,11 +37,11 @@ public class PaymentArchive {
     @Column(nullable = false)
     protected LocalDateTime archivedAt; // 아카이브된 시간
 
-    public static PaymentArchive of(Long userId, BigDecimal amount, String approvalCode, String subscription, PaymentStatus status, LocalDateTime paymentDate) {
+    public static PaymentArchive of(Long userId, BigDecimal amount, String pgApprovalCode, String subscription, PaymentStatus status, LocalDateTime paymentDate) {
         return PaymentArchive.builder()
                 .userId(userId)
                 .amount(amount)
-                .approvalCode(approvalCode)
+                .pgApprovalCode(pgApprovalCode)
                 .subscription(subscription)
                 .status(status)
                 .paymentDate(paymentDate)

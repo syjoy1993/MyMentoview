@@ -31,6 +31,20 @@ public class SubscriptionController {
     private final PaymentService paymentService;
     private final PortonePaymentService portonePaymentService;
 
+    /*
+     * todo : 고객 니즈 충족을 위한 최소 comtroller 부재 -> 구현하기
+     *   -  구독상태 + 다음 결제정보 : 현재 로그인 유저의 활성 구독 한건만 조회
+     *       - 포함 정보 :
+     *           - 구독상태
+     *           - 다음 결제 예정일
+     *           - 다음 결제 금액
+     *           - 사용중 결제수단요약정보()
+     *          => SubscriptionCurrentResp
+     */
+
+
+
+
     @Operation(summary = "구독 조회", description = "사용자의 모든 구독 내역과 구독 각각에 대한 결제 내역을 전달합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구독 조회에 성공했습니다.")
@@ -39,7 +53,7 @@ public class SubscriptionController {
     public ResponseEntity<List<SubscriptionResp>> getSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
         Long userId = mvPrincipalDetails.getUserId();
-       // Long userId = 1L;
+        // Long userId = 1L;
 
         List<SubscriptionResp> subscriptions = subscriptionService.getSubscriptions(userId);
         for (SubscriptionResp subscriptionResp : subscriptions) {
@@ -58,7 +72,7 @@ public class SubscriptionController {
     public ResponseEntity<String> getSubscriptionStatus(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
 
         Long userId = mvPrincipalDetails.getUserId();
-       // Long userId = 1L;
+        // Long userId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(userId, SubscriptionStatus.ACTIVE) != null) {
             return ResponseEntity.ok("구독 처리 완료");
@@ -78,7 +92,7 @@ public class SubscriptionController {
     public ResponseEntity<String> deleteSubscription(@PathVariable("subscription_id") Long sId, @AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
         Long uId = mvPrincipalDetails.getUserId();
-       // Long uId = 1L;
+        // Long uId = 1L;
         Long checkSId = subscriptionService.checkSubscription(uId);
 
         if (checkSId != null && checkSId.equals(sId)) {
@@ -106,12 +120,12 @@ public class SubscriptionController {
     public ResponseEntity<String> createSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) throws JsonProcessingException {
 
         Long uId = mvPrincipalDetails.getUserId();
-       // Long uId = 1L;
+        // Long uId = 1L;
 
         if (subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.CANCELED) != null) {
             // 현재 CANCELED 상태의 구독의 nextBillingDate로 결제를 예약하고, 구독의 상태 ACTIVE로 변경
             portonePaymentService.processSubscriptionReactivation(uId);
-          
+
         } else {
             // 바로 결제 진행
             portonePaymentService.createPayment(uId);
@@ -137,5 +151,20 @@ public class SubscriptionController {
 
         return ResponseEntity.ok("구독 요청이 정상적으로 처리되었습니다.");
 
+    }
+    @Operation(summary = "현재 활성 구독 요약 조회", description = "사용자의 활성 구독 상태, 다음 결제일, 금액 등을 조회합니다.")
+    @GetMapping("/subscription/current")
+    public ResponseEntity<?> getCurrentSubscription(@AuthenticationPrincipal MvPrincipalDetails mvPrincipalDetails) {
+        Long uId = mvPrincipalDetails.getUserId();
+
+        // 1. 활성 구독 조회
+        // Subscription subscription = subscriptionService.getSubscriptionByUserId(uId, SubscriptionStatus.ACTIVE);
+        // if (subscription == null) return ResponseEntity.noContent().build();
+
+        // 2. DTO 매핑 (SubscriptionCurrentResp 필요)
+        // return ResponseEntity.ok(SubscriptionCurrentResp.from(subscription));
+
+        // TODO: 구현 필요 (Service 레벨에서 DTO 리턴하도록)
+        return ResponseEntity.ok("구독 정보 조회 API (구현 예정)");
     }
 }

@@ -76,7 +76,7 @@ public class UserService {
         userRepository.save(User.toEntity(changed));
     }
 
-    @Transactional
+/*    @Transactional
     public void setBillingKey(Long uId, String billingKey) {
         User user = userRepository.findById(uId).orElseThrow();
         userRepository.save(user.updateBillingKey(billingKey));
@@ -86,7 +86,7 @@ public class UserService {
     public String getBillingKey(Long uId) {
         User user = userRepository.findById(uId).orElseThrow();
         return user.getBillingKey();
-    }
+    }*/
 
     @Transactional(readOnly = true)
     public UserDto findByEmail(String email) {

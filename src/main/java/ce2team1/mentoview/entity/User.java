@@ -36,19 +36,28 @@ public class User extends AuditingFields {
     @Convert(converter = UserRoleConverter.class)
     private Role role;
 
-    @Column(nullable = true) @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(50)")
+    @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;// OAuth
 
     @Column(nullable = true)
     private String providerId;// OAuth의 providerId
 
+    @Column(nullable = false, columnDefinition = "varchar(50)")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    private String billingKey;
+    //private String billingKey;
+    /*
+     * todo
+     *   - private String billingKey; -> deprecated -> deleted
+     *   - SocialProvider , UserStatus
+     *       - @Enumerated(EnumType.STRING) hibernate6.xx && MySQL정책 변경 반영
+     *       => @Column(nullable = false, columnDefinition = "varchar(20)") 추가
+     */
 
 
-    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status, String billingKey ) {
+    public static User of(String email, String password, String name, Role role, SocialProvider socialProvider, String providerId, boolean isForm, UserStatus status) {
         return new User(
                 null,
                 email,
@@ -57,8 +66,8 @@ public class User extends AuditingFields {
                 role != null ? role : Role.USER,  // 기본값: USER
                 socialProvider,
                 providerId,
-                status != null ? status : UserStatus.ACTIVE,  // 기본값: ACTIVE
-                null);
+                status != null ? status : UserStatus.ACTIVE  // 기본값: ACTIVE
+                );
 
     }
     public static User toEntity(UserDto userDto) {
@@ -71,16 +80,8 @@ public class User extends AuditingFields {
                 .socialProvider(userDto.getSocialProvider())
                 .providerId(userDto.getProviderId())
                 .status(userDto.getStatus())
-                .billingKey(userDto.getBillingKey())
                 .build();
 
-    }
-
-
-    public User updateBillingKey(String billingKey) {
-        return this.toBuilder()
-                .billingKey(billingKey)
-                .build();
     }
 
 

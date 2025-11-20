@@ -6,7 +6,8 @@ import ce2team1.mentoview.entity.atrribute.PaymentStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -20,52 +21,58 @@ public class PaymentDto {
 
     private Long paymentId;
     private BigDecimal amount;
-    private String approvalCode;
+    private String pgApprovalCode; // 이름 변경 (approvalCode -> pgApprovalCode)
     private PaymentStatus status;
     private LocalDateTime paymentDate;
-    private Long subId;
+    private String transactionId; // 추가 포트원 거래 ID
+    private String merchantUid;   // 추가
+    private Long subscriptionId;
 
-    private static PaymentDto of(BigDecimal amount, String approvalCode, PaymentStatus status, LocalDateTime paymentDate, Long subId) {
-        return new PaymentDto(null, amount, approvalCode, status, paymentDate, subId);
-    }
-    private static PaymentDto of(Long paymentId, BigDecimal amount, String approvalCode, PaymentStatus status, LocalDateTime paymentDate, Long subId) {
-        return new PaymentDto(paymentId, amount, approvalCode, status, paymentDate, subId);
-    }
-
+    // --- Entity -> DTO 변환 ---
     public static PaymentDto toDto(Payment payment) {
         return PaymentDto.builder()
                 .paymentId(payment.getPaymentId())
                 .amount(payment.getAmount())
-                .approvalCode(payment.getApprovalCode())
+                .pgApprovalCode(payment.getPgApprovalCode()) // 변경된 필드
                 .status(payment.getStatus())
                 .paymentDate(payment.getPaymentDate())
-                .subId(payment.getSubscription().getSubId())
+                .transactionId(payment.getTransactionId()) // 추가된 필드
+                .merchantUid(payment.getMerchantUid())     // 추가된 필드
+                .subscriptionId(payment.getSubscription().getSubId())
                 .build();
+    }
+    public static PaymentDto fromPortone(PortonePayment portonePayment, Long subId) {
+        // 시간 파싱 로직 (Portone ISO String -> LocalDateTime)
+        // (기존 로직 유지하되, 필요시 개선)
+        LocalDateTime payDate = LocalDateTime.now(); // 임시
+        if (portonePayment.getPaidAt() != null) {
+            payDate = ZonedDateTime.parse(portonePayment.getPaidAt(), DateTimeFormatter.ISO_DATE_TIME)
+                    .toLocalDateTime();
+        }
 
+        return PaymentDto.builder()
+                .amount(portonePayment.getAmount().getTotal())
+                // 승인번호가 없으면 transactionId로 대체하는 등의 방어 로직
+                .pgApprovalCode(portonePayment.getTransactionId() != null ? portonePayment.getTransactionId() : "N/A")
+                .status(PaymentStatus.SUCCESS) // 보통 체크 후 저장
+                .paymentDate(payDate)
+                .transactionId(portonePayment.getId())       // 포트원 ID, Entity: transactionId
+                .merchantUid(portonePayment.getMerchantId()) // 주문번호
+                .subscriptionId(subId)
+                .build();
     }
 
-    public static PaymentDto checkToDto(PaymentCheckDto paymentCheckDto, Long subId) {
-
-        String paidAtString = paymentCheckDto.getPaidAt();
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(paidAtString, DateTimeFormatter.ISO_DATE_TIME);
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.systemDefault());
-
-        return PaymentDto.of(
-                paymentCheckDto.getAmount().getTotal(),
-                paymentCheckDto.getTransactionId(),
-                PaymentStatus.SUCCESS,
-                localDateTime,
-                subId);
-    }
-
+    // --- DTO -> Entity 변환 ---
     public Payment toEntity(Subscription subscription) {
-        return Payment.of(
-                this.amount,
-                this.approvalCode,
-                this.getStatus(),
-                this.getPaymentDate(),
-                subscription
-                );
+        return Payment.builder()
+                .amount(this.amount)
+                .pgApprovalCode(this.pgApprovalCode)
+                .status(this.status)
+                .paymentDate(this.paymentDate)
+                .transactionId(this.transactionId)
+                .merchantUid(this.merchantUid)
+                .subscription(subscription)
+                .build();
     }
 
 }
