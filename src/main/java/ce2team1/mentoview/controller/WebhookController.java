@@ -22,6 +22,14 @@ import java.util.Map;
 @Tag(name = "Webhook API", description = "포트원 서버의 웹훅을 전달받을 API (빌링키 발급, 결제 처리)")
 @RequiredArgsConstructor
 public class WebhookController {
+    /*
+     * todo
+     *  - 전체 로직 확인 및 테스트 필요
+     *  - swagger 문서화 점김 필요
+     *  - 메서드 역할 분리 체크
+     *
+     * */
+
 
     private final WebhookVerifierAdapter webhookVerifierAdapter;
     private final PortonePaymentService portonePaymentService;
@@ -87,8 +95,8 @@ public class WebhookController {
             return ResponseEntity.badRequest().body("Invalid JSON");
         }
     }
-
-    @Operation(summary = "결제 수단 변경으로 빌링키 발급", description = "포트원 서버에서 빌링키가 발급되면, 기존 결제 예약을 취소하고 새로 발급된 빌링키로 다시 결제를 예약합니다.")
+    // d와
+    @Operation(summary = "결제 수단 변경으로 빌링키 발급", description = "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "웹훅 검증 성공")
     })

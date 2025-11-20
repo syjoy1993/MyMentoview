@@ -27,6 +27,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SubscriptionService {
+    /*
+     * Todo
+     *  - BillingKey필드 User -> Subscription 변경 V
+     *  - 불필요 메서드
+     *  - UserRepository를 통해 User필드 변경 여부 체크
+     *  - Service가 다른 계층이 하는 일을 하는지 체크
+     *
+     * */
+
 
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;

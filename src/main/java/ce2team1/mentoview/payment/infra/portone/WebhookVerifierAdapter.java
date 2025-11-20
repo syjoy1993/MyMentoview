@@ -14,19 +14,19 @@ import java.util.Map;
 @Slf4j
 @Component
 public class WebhookVerifierAdapter {
-    //WebhookService -> 클래스명 +용도 변경 WebhookVerifierAdapter
-
+    // Note : WebhookService -> 클래스명 + 용도 변경 WebhookVerifier을 담는 역할로 사용
     /*
-    * todo
-    *   - WebhookVerifier.verify() : Webhook 객체를 생성하고 유효성을 검증하는 메서드
-    *       -> 문서 상 내부에 parsing 후 매핑해줌 ObjectMapper에 담아서 사용X
-    *   -   이유:
-    *       - ObjectMapper으로 parsing : 파싱하면서  body 소멸
-    *       - 가장 큰문제는 raw data가 아니므로,
-    *        실제 WebhookVerifier가 parsing 할때 이미 다른 데이터가 되어 해시함수가 다른 결과를 낼 가능 성이 높음
-    *   ==> 방향 변경 : WebhookController에서 모든 비즈니스 로직을 담당하고 있음이 실질적 비즈니스 로직담당
-    *   -> WebhookService -> 네이밍 변경 WebhookVerifierAdapter WebhookVerifier을 담는 역할로 사용
-    */
+     * Important
+     *  - WebhookVerifier.verify() : Webhook 객체를 생성하고 유효성을 검증하는 메서드
+     *      문서 상 내부에 parsing 후 매핑해줌 -> ObjectMapper에 담아서 사용X
+     *  - 이유:
+     *       - ObjectMapper으로 parsing : 파싱하면서  body 소멸
+     *       - 가장 큰문제는 raw data가 아니므로,
+     *        실제 WebhookVerifier가 parsing 할때 이미 다른 데이터가 되어 해시함수가 다른 결과를 낼 가능 성이 높음
+     *  -  WebhookController에서 모든 비즈니스 로직을 담당하고 있음이 실질적 비즈니스 로직담당
+     *
+     * */
+
     private WebhookVerifier webhookVerifier; // Bean등록
 
     public boolean verifyWebhook(String rawBody, Map<String, String> headers) throws JsonProcessingException {

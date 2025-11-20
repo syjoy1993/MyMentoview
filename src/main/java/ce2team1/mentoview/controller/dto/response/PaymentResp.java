@@ -20,6 +20,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentResp {
+    /*
+     * todo
+     *  - PaymentResp, SubscriptionResp -> controller.dto.response 패키지 미사용 객체 정리 -> 사용후 패키지 명에 맞게 이동
+     *  - response : 응답객체 시그니처 쳌크
+     *  - 필요 객체 생성
+     *  - 모두 완료후 패키지 명에 맞게 이동
+     *
+     * */
 
     private Long paymentId;
     private BigDecimal amount;
@@ -32,10 +40,10 @@ public class PaymentResp {
         return PaymentResp.builder()
                 .paymentId(dto.getPaymentId())
                 .amount(dto.getAmount())
-                .approvalCode(dto.getApprovalCode())
+                .approvalCode(dto.getPgApprovalCode())
                 .status(dto.getStatus())
                 .paymentDate(dto.getPaymentDate())
-                .subId(dto.getSubId())
+                .subId(dto.getSubscriptionId())
                 .build();
     }
 }

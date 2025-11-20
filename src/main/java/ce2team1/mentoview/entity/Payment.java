@@ -17,6 +17,15 @@ import java.util.Objects;
 @Getter
 @Entity
 public class Payment {
+    /*
+     * todo : Payment, Subscription
+     *  - ERD에 맞게 Column 타입 설정 V
+     *  - 필드명 변경 + 반영 V
+     *  - 생성자 메서드 변경완료 -> Service 계층 Dto까지 변경 V
+     *
+     * */
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")

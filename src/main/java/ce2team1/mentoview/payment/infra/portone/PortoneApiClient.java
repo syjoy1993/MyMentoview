@@ -35,6 +35,23 @@ public class PortoneApiClient {
 
     private final String baseUrl = "https://api.portone.io";
     private static final String AUTH_HEADER_PREFIX = "PortOne ";
+    /*
+     * Note
+     *  - PortonePaymentService가 오케스트레이션을 담당 ->  PortoneApiClient는 PortonePaymentService의 API 통신 전담
+     *  -
+     * Todo
+     *  - 예외처리 통일성 체크 필요
+     *  - getPayment() 처럼 각 API마다 개별적인 예외처리가 필요하다
+     *      - getPayment(String paymentId) V
+     *      - getBillingKey(String billingKey)
+     *      - createPayment()
+     *      - schedulePayment()
+     *      - cancelSchedules()
+     *      - deleteBillingKey()
+     *      - getScheduleTimeToPay()
+     *
+     * */
+
 
     // 결제 단건 조회
     public PortonePayment getPayment(String paymentId){

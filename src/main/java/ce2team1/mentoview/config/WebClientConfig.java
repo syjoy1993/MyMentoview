@@ -17,9 +17,9 @@ public class WebClientConfig {
 
     /*
      * todo
-     *  - 백프레셔
-     *  - timeout 설정 필요
-     *  -
+     *  - 백프레셔 V
+     *  - timeout 설정 필요 V
+     *  - timeout -> 시간에대해서 검색 후 문서화 할 것
      * */
 
     @Bean

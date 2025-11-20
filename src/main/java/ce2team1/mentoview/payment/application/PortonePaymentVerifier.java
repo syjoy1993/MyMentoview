@@ -14,6 +14,15 @@ public class PortonePaymentVerifier implements PaymentVerifier, BillingKeyVerifi
     // 결제 검증
     // Portone 응답 유효X -> 예외
     // expectedAmount : 금액비교, 현 default 10_000
+    /*
+     * todo
+     *  - 검증 메서드 정합성 test
+     *  - 검증이외 다른 작업 여부 체크
+     *  - 사이드 이펙트 가능성 체크
+     *  - 추가 검증 사항 문서 대조 비교 후 추가사항 명시 -> dto에 반영할 것
+     *  - 현 로직 예외 처리 부 체크
+     * */
+
 
     @Override
     public void verifyPayment(PortonePayment portonePayment, SubscriptionDto subscriptionDto, BigDecimal expectedAmount) {
