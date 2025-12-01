@@ -1,7 +1,7 @@
 package ce2team1.mentoview.security.service;
 
-import ce2team1.mentoview.entity.atrribute.Role;
-import ce2team1.mentoview.repository.RefreshTokenRepository;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
+import ce2team1.mentoview.security.repository.RefreshTokenRepository;
 import ce2team1.mentoview.security.entity.RefreshToken;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

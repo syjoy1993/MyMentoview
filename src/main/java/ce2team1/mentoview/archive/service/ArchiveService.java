@@ -8,10 +8,19 @@ import ce2team1.mentoview.archive.entity.UserArchive;
 import ce2team1.mentoview.archive.repository.InterviewArchiveRepository;
 import ce2team1.mentoview.archive.repository.PaymentArchiveRepository;
 import ce2team1.mentoview.archive.repository.UserArchiveRepository;
-import ce2team1.mentoview.entity.*;
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.repository.*;
-import ce2team1.mentoview.service.AwsS3Service;
+import ce2team1.mentoview.common.infra.storage.AwsS3Service;
+import ce2team1.mentoview.interview.domain.entity.Interview;
+import ce2team1.mentoview.interview.domain.repository.InterviewQuestionRepository;
+import ce2team1.mentoview.interview.domain.repository.InterviewRepository;
+import ce2team1.mentoview.payment.domain.entity.Payment;
+import ce2team1.mentoview.payment.domain.repository.PaymentRepository;
+import ce2team1.mentoview.resume.domain.entity.Resume;
+import ce2team1.mentoview.resume.domain.repository.ResumeRepository;
+import ce2team1.mentoview.subscription.domain.entity.Subscription;
+import ce2team1.mentoview.subscription.domain.repository.SubscriptionRepository;
+import ce2team1.mentoview.user.domain.entity.User;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import ce2team1.mentoview.utils.archive.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +90,7 @@ public class ArchiveService {
 
     }
 
+    // subscriptions & payment
     @Transactional(readOnly = false)
     public List<PaymentArchive> archiveUserPayments(Long userId) {
         List<Subscription> subscriptions = subscriptionRepository.findAllByUser_UserId(userId);
@@ -97,7 +107,7 @@ public class ArchiveService {
                         payment -> PaymentArchive.of(
                                 userId,
                                 payment.getAmount(),
-                                payment.getApprovalCode(),
+                                payment.getPgApprovalCode(),
                                 payment.getSubscription().getPlan().name(),
                                 payment.getStatus(),
                                 payment.getPaymentDate()
@@ -109,6 +119,7 @@ public class ArchiveService {
         return paymentArchives;
 
     }
+
 
     @Transactional(readOnly = false)
     public void archiveUser(Long userId) {

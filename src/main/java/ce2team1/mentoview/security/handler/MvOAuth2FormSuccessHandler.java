@@ -1,11 +1,11 @@
 package ce2team1.mentoview.security.handler;
 
-import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import ce2team1.mentoview.security.dto.LoginType;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
-import ce2team1.mentoview.service.dto.UserDto;
+import ce2team1.mentoview.user.application.dto.UserDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,6 +1,6 @@
 package ce2team1.mentoview.security.dto;
 
-import ce2team1.mentoview.entity.atrribute.SocialProvider;
+import ce2team1.mentoview.user.domain.entity.atrribute.SocialProvider;
 
 import java.util.Map;
 

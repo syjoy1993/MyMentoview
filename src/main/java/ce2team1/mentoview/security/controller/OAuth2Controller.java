@@ -1,11 +1,11 @@
 package ce2team1.mentoview.security.controller;
 
-import ce2team1.mentoview.controller.dto.response.UserResp;
-import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.user.presentation.dto.response.UserResp;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
-import ce2team1.mentoview.service.UserService;
-import ce2team1.mentoview.service.dto.UserDto;
+import ce2team1.mentoview.user.application.UserService;
+import ce2team1.mentoview.user.application.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -1,7 +1,7 @@
 package ce2team1.mentoview.archive.entity;
 
-import ce2team1.mentoview.entity.atrribute.Role;
-import ce2team1.mentoview.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
 import ce2team1.mentoview.utils.jpaconverter.UserRoleConverter;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,14 +1,14 @@
 package ce2team1.mentoview.security.service;
 
-import ce2team1.mentoview.entity.User;
-import ce2team1.mentoview.entity.atrribute.Role;
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.repository.UserRepository;
 import ce2team1.mentoview.security.dto.GoogleOAuth2Response;
 import ce2team1.mentoview.security.dto.LoginType;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.dto.OAuth2ResponseSocial;
-import ce2team1.mentoview.service.dto.UserDto;
+import ce2team1.mentoview.user.application.dto.UserDto;
+import ce2team1.mentoview.user.domain.entity.User;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

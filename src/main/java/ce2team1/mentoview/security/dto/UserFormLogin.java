@@ -1,6 +1,7 @@
 package ce2team1.mentoview.security.dto;
 
 
+import ce2team1.mentoview.user.domain.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for {@link ce2team1.mentoview.entity.User}
+ * DTO for {@link User}
  */
 @Getter
 @Builder

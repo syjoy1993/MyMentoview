@@ -1,6 +1,6 @@
 package ce2team1.mentoview.utils.jpaconverter;
 
-import ce2team1.mentoview.entity.atrribute.SubscriptionStatus;
+import ce2team1.mentoview.subscription.domain.attribute.SubscriptionStatus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

@@ -1,31 +1,31 @@
 package ce2team1.mentoview.archive;
 
-import ce2team1.mentoview.archive.dto.InterviewData;
-import ce2team1.mentoview.archive.dto.InterviewEntry;
-import ce2team1.mentoview.archive.entity.*;
+import ce2team1.mentoview.archive.entity.InterviewArchive;
+import ce2team1.mentoview.archive.entity.PaymentArchive;
 import ce2team1.mentoview.archive.repository.InterviewArchiveRepository;
 import ce2team1.mentoview.archive.repository.PaymentArchiveRepository;
 import ce2team1.mentoview.archive.repository.UserArchiveRepository;
 import ce2team1.mentoview.archive.service.ArchiveService;
-import ce2team1.mentoview.entity.*;
-import ce2team1.mentoview.repository.*;
-import ce2team1.mentoview.service.AwsS3Service;
-import ce2team1.mentoview.utils.archive.JsonUtils;
+import ce2team1.mentoview.common.infra.storage.AwsS3Service;
+import ce2team1.mentoview.interview.domain.repository.InterviewRepository;
+import ce2team1.mentoview.payment.domain.repository.PaymentRepository;
+import ce2team1.mentoview.resume.domain.repository.ResumeRepository;
+import ce2team1.mentoview.subscription.domain.repository.SubscriptionRepository;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @SpringBootTest
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ArchiveServiceTest {
     @Autowired
-    private  InterviewRepository interviewRepository;
+    private InterviewRepository interviewRepository;
     @Autowired
     private ResumeRepository resumeRepository;
     @Autowired

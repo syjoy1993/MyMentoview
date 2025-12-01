@@ -1,8 +1,8 @@
 package ce2team1.mentoview.archive.service;
 
-import ce2team1.mentoview.entity.User;
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.repository.UserRepository;
+import ce2team1.mentoview.user.domain.entity.User;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,7 +1,7 @@
 package ce2team1.mentoview.security.dto;
 
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.service.dto.UserDto;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.application.dto.UserDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

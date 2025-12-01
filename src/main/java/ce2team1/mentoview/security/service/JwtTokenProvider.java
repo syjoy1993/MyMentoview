@@ -1,6 +1,6 @@
 package ce2team1.mentoview.security.service;
 
-import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import io.jsonwebtoken.Jwts;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

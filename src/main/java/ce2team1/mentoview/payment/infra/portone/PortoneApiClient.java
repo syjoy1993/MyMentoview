@@ -2,7 +2,7 @@ package ce2team1.mentoview.payment.infra.portone;
 
 import ce2team1.mentoview.exception.SubscriptionException;
 import ce2team1.mentoview.payment.infra.portone.dto.PortoneBillingKey;
-import ce2team1.mentoview.service.dto.PortonePayment;
+import ce2team1.mentoview.payment.application.dto.PortonePayment;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.timeout.TimeoutException;

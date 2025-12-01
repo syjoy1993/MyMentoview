@@ -1,10 +1,14 @@
 package ce2team1.mentoview.archive.service;
 
-import ce2team1.mentoview.entity.Interview;
-import ce2team1.mentoview.entity.Payment;
-import ce2team1.mentoview.entity.Resume;
-import ce2team1.mentoview.entity.Subscription;
-import ce2team1.mentoview.repository.*;
+import ce2team1.mentoview.interview.domain.entity.Interview;
+import ce2team1.mentoview.interview.domain.repository.InterviewRepository;
+import ce2team1.mentoview.payment.domain.entity.Payment;
+import ce2team1.mentoview.resume.domain.entity.Resume;
+import ce2team1.mentoview.subscription.domain.entity.Subscription;
+import ce2team1.mentoview.payment.domain.repository.PaymentRepository;
+import ce2team1.mentoview.subscription.domain.repository.SubscriptionRepository;
+import ce2team1.mentoview.resume.domain.repository.ResumeRepository;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;

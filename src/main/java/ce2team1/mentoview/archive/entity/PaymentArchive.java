@@ -1,6 +1,6 @@
 package ce2team1.mentoview.archive.entity;
 
-import ce2team1.mentoview.entity.atrribute.PaymentStatus;
+import ce2team1.mentoview.payment.domain.attribute.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

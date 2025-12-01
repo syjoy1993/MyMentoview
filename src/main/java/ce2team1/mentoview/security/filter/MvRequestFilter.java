@@ -2,8 +2,8 @@ package ce2team1.mentoview.security.filter;
 
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import ce2team1.mentoview.security.service.JwtTokenProvider;
-import ce2team1.mentoview.service.UserService;
-import ce2team1.mentoview.service.dto.UserDto;
+import ce2team1.mentoview.user.application.UserService;
+import ce2team1.mentoview.user.application.dto.UserDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

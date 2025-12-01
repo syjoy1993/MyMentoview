@@ -1,8 +1,8 @@
 package ce2team1.mentoview.security.filter;
 
-import ce2team1.mentoview.entity.User;
-import ce2team1.mentoview.entity.atrribute.UserStatus;
-import ce2team1.mentoview.repository.UserRepository;
+import ce2team1.mentoview.user.domain.entity.User;
+import ce2team1.mentoview.user.domain.entity.atrribute.UserStatus;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

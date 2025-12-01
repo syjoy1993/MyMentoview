@@ -1,6 +1,6 @@
 package ce2team1.mentoview.archive.dto;
 
-import ce2team1.mentoview.entity.InterviewQuestion;
+import ce2team1.mentoview.interview.domain.entity.InterviewQuestion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

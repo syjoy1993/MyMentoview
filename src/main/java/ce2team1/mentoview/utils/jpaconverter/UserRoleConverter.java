@@ -1,7 +1,7 @@
 package ce2team1.mentoview.utils.jpaconverter;
 
 
-import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

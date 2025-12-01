@@ -1,6 +1,6 @@
 package ce2team1.mentoview.security.controller;
 
-import ce2team1.mentoview.entity.atrribute.Role;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import ce2team1.mentoview.security.service.JwtTokenProvider;
 import ce2team1.mentoview.security.service.RefreshTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -44,7 +44,7 @@ public class TokenController {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>("token not found", HttpStatus.UNAUTHORIZED);
         }
-        String token = authHeader.substring(0,7);
+        String token = authHeader.substring(7).trim();
 
         if(jwtTokenProvider.isExpired(token)){
             return new ResponseEntity<>("token expired", HttpStatus.UNAUTHORIZED);

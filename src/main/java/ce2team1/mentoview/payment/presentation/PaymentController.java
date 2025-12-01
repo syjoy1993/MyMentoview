@@ -1,11 +1,11 @@
 package ce2team1.mentoview.payment.presentation;
 
-import ce2team1.mentoview.controller.dto.response.PaymentResp;
+import ce2team1.mentoview.payment.infra.portone.dto.PaymentResp;
 import ce2team1.mentoview.security.dto.MvPrincipalDetails;
-import ce2team1.mentoview.service.PaymentService;
-import ce2team1.mentoview.service.PortonePaymentService;
-import ce2team1.mentoview.service.SubscriptionService;
-import ce2team1.mentoview.service.UserService;
+import ce2team1.mentoview.payment.application.service.PaymentService;
+import ce2team1.mentoview.payment.application.orchestrator.PortonePaymentService;
+import ce2team1.mentoview.subscription.application.service.SubscriptionService;
+import ce2team1.mentoview.user.application.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

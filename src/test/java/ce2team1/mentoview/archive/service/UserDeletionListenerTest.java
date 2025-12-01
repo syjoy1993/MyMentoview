@@ -1,15 +1,14 @@
 package ce2team1.mentoview.archive.service;
 
-import ce2team1.mentoview.archive.entity.InterviewArchive;
 import ce2team1.mentoview.archive.repository.InterviewArchiveRepository;
 import ce2team1.mentoview.archive.repository.PaymentArchiveRepository;
 import ce2team1.mentoview.archive.repository.UserArchiveRepository;
-import ce2team1.mentoview.entity.Interview;
-import ce2team1.mentoview.entity.Payment;
-import ce2team1.mentoview.entity.Resume;
-import ce2team1.mentoview.entity.Subscription;
-import ce2team1.mentoview.repository.*;
-import ce2team1.mentoview.service.AwsS3Service;
+import ce2team1.mentoview.common.infra.storage.AwsS3Service;
+import ce2team1.mentoview.interview.domain.repository.InterviewRepository;
+import ce2team1.mentoview.payment.domain.repository.PaymentRepository;
+import ce2team1.mentoview.resume.domain.repository.ResumeRepository;
+import ce2team1.mentoview.subscription.domain.repository.SubscriptionRepository;
+import ce2team1.mentoview.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

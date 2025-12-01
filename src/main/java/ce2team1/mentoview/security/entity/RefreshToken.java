@@ -44,6 +44,8 @@ public class RefreshToken {
                 expirationDate.plusDays(MAX_EXPIRATION_DAYS)
         );
     }
+
+    // Todo: 도메인 순수성?
     public static RefreshToken toEntity(RefreshTokenDto tokenDto) {
         return RefreshToken.builder()
                 .userEmail(tokenDto.getUserEmail())
