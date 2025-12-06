@@ -1,15 +1,18 @@
 package ce2team1.mentoview.security.service;
 
-import ce2team1.mentoview.user.domain.entity.atrribute.Role;
-import ce2team1.mentoview.security.repository.RefreshTokenRepository;
+
 import ce2team1.mentoview.security.entity.RefreshToken;
+import ce2team1.mentoview.security.repository.RefreshTokenRepository;
+import ce2team1.mentoview.user.domain.entity.atrribute.Role;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
@@ -47,7 +50,9 @@ public class RefreshTokenBatchJob {
     }
 
 
-    @TransactionalEventListener
+    // @TransactionalEventListener 기본이 AFTER_COMMIT
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void rotateRefreshToken(RefreshTokenDeletedEvent deletedEvent) {
         log.info("만료 토큰 삭제 완료 ==> Start Rotating refresh token!!");
         List<RefreshToken> expiringRefreshTokens = refreshTokenRepository.findExpiringRefreshTokens(LocalDateTime.now().minusMinutes(1));
