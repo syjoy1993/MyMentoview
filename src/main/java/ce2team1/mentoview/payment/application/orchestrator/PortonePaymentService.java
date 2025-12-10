@@ -1,15 +1,15 @@
 package ce2team1.mentoview.payment.application.orchestrator;
 
+import ce2team1.mentoview.exception.SubscriptionException;
+import ce2team1.mentoview.payment.application.dto.PortonePayment;
 import ce2team1.mentoview.payment.application.service.PaymentService;
 import ce2team1.mentoview.payment.application.service.PortonePaymentVerifier;
-import ce2team1.mentoview.payment.infra.portone.dto.PaymentCreate;
-import ce2team1.mentoview.subscription.application.service.SubscriptionService;
-import ce2team1.mentoview.subscription.domain.entity.Subscription;
-import ce2team1.mentoview.subscription.domain.attribute.SubscriptionStatus;
-import ce2team1.mentoview.exception.SubscriptionException;
 import ce2team1.mentoview.payment.infra.portone.PortoneApiClient;
+import ce2team1.mentoview.payment.infra.portone.dto.PaymentCreate;
 import ce2team1.mentoview.payment.infra.portone.dto.PortoneBillingKey;
-import ce2team1.mentoview.payment.application.dto.PortonePayment;
+import ce2team1.mentoview.subscription.application.service.SubscriptionService;
+import ce2team1.mentoview.subscription.domain.attribute.SubscriptionStatus;
+import ce2team1.mentoview.subscription.domain.entity.Subscription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -135,7 +135,7 @@ public class PortonePaymentService {
         }
 
         // 3. 기존 스케줄 시간 확인
-        String timeToPayStr = apiClient.getScheduleTimeToPay(subscription.getPortoneScheduleId());
+        String timeToPayStr = apiClient.getScheduleTimeToPay(subscription.getBillingScheduleId());
 
         // 4. 기존 스케줄 취소
         cancelScheduling(uId);

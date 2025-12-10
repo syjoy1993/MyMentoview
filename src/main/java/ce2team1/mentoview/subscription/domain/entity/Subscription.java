@@ -1,11 +1,11 @@
 package ce2team1.mentoview.subscription.domain.entity;
 
 
-import ce2team1.mentoview.user.domain.entity.User;
-import ce2team1.mentoview.user.domain.entity.atrribute.AuditingFields;
 import ce2team1.mentoview.payment.domain.attribute.PaymentMethod;
 import ce2team1.mentoview.subscription.domain.attribute.SubscriptionPlan;
 import ce2team1.mentoview.subscription.domain.attribute.SubscriptionStatus;
+import ce2team1.mentoview.user.domain.entity.User;
+import ce2team1.mentoview.user.domain.entity.atrribute.AuditingFields;
 import ce2team1.mentoview.utils.jpaconverter.SubscriptionStatusConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,8 +49,8 @@ public class Subscription extends AuditingFields {
     @Column(name = "billing_key", length = 50)
     private String billingKey; // 구독 결제에 사용된 빌링키
 
-    @Column(name = "portone_schedule_id", length = 255)
-    private String portoneScheduleId; // 결제 예약 건 id : 결제 수단 변경 시 필요
+    @Column(name = "billing_schedule_id", length = 255)
+    private String billingScheduleId; // 결제 예약 건 id : 결제 수단 변경 시 필요
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -66,11 +66,11 @@ public class Subscription extends AuditingFields {
 
 
 
-    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String portoneScheduleId, User user) {
-        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portoneScheduleId, user);
+    public static Subscription of(SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String billingScheduleId, User user) {
+        return new Subscription(null, status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, billingScheduleId, user);
     }
-    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String portoneScheduleId, User user) {
-        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, portoneScheduleId, user);
+    public static Subscription of(Long subId, SubscriptionStatus status, SubscriptionPlan plan, LocalDate startDate, LocalDate endDate, LocalDate nextBillingDate, PaymentMethod paymentMethod, String billingKey, String billingScheduleId, User user) {
+        return new Subscription(subId,status, plan, startDate, endDate, nextBillingDate, paymentMethod, billingKey, billingScheduleId, user);
     }
 
 /*
@@ -116,8 +116,8 @@ public class Subscription extends AuditingFields {
         }
     }
 
-    public void setPaymentIdAndScheduleId(String portoneScheduleId) {
-        this.portoneScheduleId = portoneScheduleId;
+    public void setPaymentIdAndScheduleId(String billingScheduleId) {
+        this.billingScheduleId = billingScheduleId;
     }
 
 

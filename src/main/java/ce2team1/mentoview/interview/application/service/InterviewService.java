@@ -1,14 +1,12 @@
 package ce2team1.mentoview.interview.application.service;
 
 
-import ce2team1.mentoview.common.infra.storage.AwsS3Service;
 import ce2team1.mentoview.exception.InterviewException;
 import ce2team1.mentoview.interview.domain.atrribute.InterviewStatus;
 import ce2team1.mentoview.interview.domain.entity.Interview;
 import ce2team1.mentoview.interview.domain.entity.InterviewQuestion;
 import ce2team1.mentoview.interview.domain.repository.InterviewQuestionRepository;
 import ce2team1.mentoview.interview.domain.repository.InterviewRepository;
-import ce2team1.mentoview.interview.infra.AiService;
 import ce2team1.mentoview.interview.infra.dto.FAQDto;
 import ce2team1.mentoview.interview.presentation.dto.request.InterviewCreate;
 import ce2team1.mentoview.resume.domain.entity.Resume;
@@ -31,8 +29,8 @@ public class InterviewService {
     private final ResumeRepository resumeRepository;
 
 
-    private final AiService aiService;
-    private final AwsS3Service s3Service;
+    /*private final AiService aiService;
+    private final AwsS3Service s3Service;*/
 
     private static final String PDF_EXTENSION = ".pdf";
 
@@ -92,6 +90,7 @@ public class InterviewService {
 
     @Transactional(readOnly = false)
     public long createInterview(InterviewCreate create, long resumeId) {
+        // Todo: ResumeRepository 의존성 제거?
         Resume resume = resumeRepository.findById(resumeId).orElseThrow(() -> new InterviewException("resume not found " + resumeId, HttpStatus.NOT_FOUND));
         Interview interview = Interview.of(
                 InterviewStatus.INTERVIEW_CREATED,
