@@ -72,12 +72,14 @@ public class ResponseOrchestrator {
             }
 
         }
+
         if (!transcribeDtos.isEmpty()) {
             transcribeService.transcribeInterviewResponse(transcribeDtos);
         }
         /* Todo: success & fail flag? 부분 성공 / 부분 실패”
         *  - 하나라도 실패면 USER_FAILED or PARTIAL_FAILED
         *  - 전부 성공일 때만 USER_COMPLETED
+        *  - Response 단위 보상 필요
         * */
         if(!files.isEmpty()) {
             Long anyQuestionId = files.keySet().iterator().next();

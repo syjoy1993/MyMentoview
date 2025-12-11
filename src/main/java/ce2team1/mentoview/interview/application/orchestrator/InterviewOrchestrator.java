@@ -1,9 +1,7 @@
 package ce2team1.mentoview.interview.application.orchestrator;
 
-import ce2team1.mentoview.common.infra.storage.AwsS3Service;
 import ce2team1.mentoview.interview.application.dto.QuestionDto;
 import ce2team1.mentoview.interview.application.service.InterviewService;
-import ce2team1.mentoview.interview.infra.AiService;
 import ce2team1.mentoview.interview.infra.PdfService;
 import ce2team1.mentoview.interview.presentation.dto.request.InterviewCreate;
 import ce2team1.mentoview.resume.application.ResumeService;
@@ -29,13 +27,12 @@ public class InterviewOrchestrator {
          * */
     // infraService
     private final PdfService pdfService;
-    private final AiService aiService;
-    private final AwsS3Service s3Service;
+
     // domainService
     private final ResumeService resumeService;
     private final InterviewService interviewService;
 
-    //
+    //Orchestrator
     private final QuestionOrchestrator questionOrchestrator;
 
 
