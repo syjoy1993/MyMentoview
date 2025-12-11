@@ -80,6 +80,7 @@ public class ResponseOrchestrator {
         *  - 하나라도 실패면 USER_FAILED or PARTIAL_FAILED
         *  - 전부 성공일 때만 USER_COMPLETED
         *  - Response 단위 보상 필요
+        *  - 현재는 인터뷰 단위 상태 보상만 제공, 향후 응답 단위 상태/리소스 보상 예정
         * */
         if(!files.isEmpty()) {
             Long anyQuestionId = files.keySet().iterator().next();
