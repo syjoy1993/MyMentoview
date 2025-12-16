@@ -52,7 +52,7 @@
 ---
 
 ## 💻기술 스택 (Tech Stack)
-- Backend: Java 17, Spring Boot 3, Spring Security 6, Spring Data JPA, OpenAI, PDFBOX, Tesseract OCR, SWAGGER, Spring Reactive
+- Backend: Java 17, Spring Boot 3, Spring Security 6, Spring Data JPA, OpenAI, PDFBOX, Tesseract OCR, SWAGGER, Spring WebFlux
 - Frontend : React, JS ES6 , HTML5, CSS3 ,Redux, React-Query, Styled-Components
 - DB: MySQL 8
 - Infra: AWS EKS, S3, Lambda, Docker, Prometheus, Grafana
